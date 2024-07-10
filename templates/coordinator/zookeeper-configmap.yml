@@ -1,0 +1,18 @@
+{{- $namespace := .Release.Namespace -}}
+  {{- $releaseName := .Release.Name }}
+{{- if or (or .Values.internalZookeeper.enabled .Values.externalZookeeper.enabled) .Values.installation.msa }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{$releaseName}}-zookeeper-config
+  namespace: {{ $namespace }}
+  labels:
+    name: {{$releaseName}}-zookeeper-config
+data:
+  ZOOKEEPER_ENABLED: "true"
+  {{- if .Values.externalZookeeper.enabled }}
+  ZOOKEEPER_URL: {{ printf "%s:%s" .Values.externalZookeeper.host .Values.externalZookeeper.port}}
+  {{- else }}
+  ZOOKEEPER_URL: {{ printf "%s-%s:2181" .Release.Name .Values.internalZookeeper.nameOverride }}
+  {{- end }}
+{{- end }}

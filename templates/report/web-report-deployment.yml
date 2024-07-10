@@ -1,0 +1,58 @@
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $namespace := .Release.Namespace }}
+  {{- $releaseName := .Release.Name }}
+  {{- if and .Values.report.enabled .Values.installation.pe }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{$releaseName}}-web-report
+  namespace: {{ $namespace }}
+spec:
+  replicas: {{.Values.report.deployment.replicas}}
+  selector:
+    matchLabels:
+      app: {{$releaseName}}-web-report
+  template:
+    metadata:
+      labels:
+        app: {{$releaseName}}-web-report
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecret }}
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: {{ include "thingsboard.report.image" . }}
+          ports:
+            - containerPort: 8383
+              name: http
+          env:
+            - name: HTTP_BIND_ADDRESS
+              value: "0.0.0.0"
+            - name: HTTP_BIND_PORT
+              value: "8383"
+            - name: LOGGER_LEVEL
+              value: "info"
+            - name: LOG_FOLDER
+              value: "logs"
+            - name: LOGGER_FILENAME
+              value: "tb-web-report-%DATE%.log"
+            - name: DOCKER_MODE
+              value: "true"
+            - name: DEFAULT_PAGE_NAVIGATION_TIMEOUT
+              value: "120000"
+            - name: DASHBOARD_LOAD_WAIT_TIME
+              value: "3000"
+          readinessProbe:
+            periodSeconds: 20
+            tcpSocket:
+              port: 8383
+          livenessProbe:
+            periodSeconds: 20
+            tcpSocket:
+              port: 8383
+          resources:
+          {{- toYaml .Values.web.resources | nindent 12 }}
+      restartPolicy: Always
+      {{- end }}
+

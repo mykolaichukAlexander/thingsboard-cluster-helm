@@ -1,0 +1,17 @@
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $namespace := .Release.Namespace }}
+  {{- $releaseName := .Release.Name }}
+{{- if and .Values.report.enabled .Values.installation.pe }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{$releaseName}}-web-report
+  namespace: {{ $namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{$releaseName}}-web-report
+  ports:
+    - port: 8383
+      name: http
+  {{- end }}

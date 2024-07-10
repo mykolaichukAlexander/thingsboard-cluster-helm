@@ -1,0 +1,17 @@
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $namespace := .Release.Namespace }}
+{{- $releaseName := .Release.Name }}
+  {{- if and .Values.web.enabled .Values.installation.msa }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{$releaseName}}-web-ui
+  namespace: {{ $namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{$releaseName}}-web-ui
+  ports:
+    - port: 8080
+      name: http
+  {{- end }}

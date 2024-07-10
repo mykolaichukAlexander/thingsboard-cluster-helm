@@ -1,0 +1,121 @@
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $releaseName := .Release.Name }}
+{{- if .Values.installation.msa }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "thingsboard.core.label" . }}
+  namespace: {{ $namespace }}
+  labels:
+    app: {{ include "thingsboard.core.label" . }}
+spec:
+  serviceName: {{ include "thingsboard.core.label" . }}
+  replicas: {{ .Values.node.statefulSet.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "thingsboard.core.label" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "thingsboard.core.label" . }}
+    spec:
+      nodeSelector:
+        {{- .Values.node.nodeSelector | toYaml | nindent 8 }}
+      affinity:
+        {{- .Values.node.affinity | toYaml | nindent 8 }}
+      securityContext:
+        {{- .Values.node.securityContext | toYaml | nindent 8 }}
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecret }}
+      initContainers: {{ include "thingsboard.initcontainers" . | indent 8 }}
+      containers:
+        - name: server
+          imagePullPolicy: {{ .Values.node.imagePullPolicy }}
+          image: {{ include "thingsboard.node.image" . }}
+          ports:
+            {{- range .Values.node.ports }}
+            - containerPort: {{ .value }}
+              name: {{ .name }}
+              protocol: {{ .protocol | default "TCP" | toString }}
+            {{- end}}
+            {{- include "thingsboard.node.ports" (dict "context" . "type" "pod") | indent 12 }}
+          env:
+            {{- if and .Values.installation.pe }}
+              {{- if .Values.report.enabled }}
+            - name: REPORTS_SERVER_ENDPOINT_URL
+              value: {{ printf "http://%s-web-report:8383" $releaseName }}
+              {{- end }}
+            - name: TB_LICENSE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: tb-license
+                  key: license-key
+            - name: TB_LICENSE_INSTANCE_DATA_FILE
+              value: "/data/instance-license-$(TB_SERVICE_ID).data"
+            {{- end }}
+            {{- range $transportKey, $transportValue := .Values.transports }}
+            - name: {{$transportKey | upper }}_ENABLED
+              value: {{ $transportValue.enabled | quote }}
+            {{- end }}
+            - name: TB_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: TB_SERVICE_TYPE
+              value: "tb-core"
+            - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
+              value: "false"
+          envFrom:
+            - configMapRef:
+                name: {{$releaseName}}-node-custom-env
+            {{- include "thingboard.coordinator.configuration.ref" . | indent 12 }}
+            {{- include "thingboard.queue.configuration.ref" . | indent 12 }}
+            {{- include "thingboard.cache.configuration.ref" . | indent 12 }}
+            {{- include "thingboard.cassandra.configuration.ref" . | indent 12 }}
+            {{- include "thingboard.postgres.configuration.ref" . | indent 12 }}
+          readinessProbe:
+            {{- .Values.node.readinessProbe | toYaml | nindent 12 }}
+          livenessProbe:
+            {{- .Values.node.livenessProbe | toYaml | nindent 12 }}
+          resources:
+            {{- .Values.node.resources | toYaml | nindent 12 }}
+          volumeMounts:
+            - name: {{$releaseName}}-core-config
+              mountPath: /config
+            - name: {{$releaseName}}-node-logs
+              mountPath: /var/log/thingsboard
+            - name: {{$releaseName}}-node-data
+              mountPath: /data
+              readOnly: false
+      restartPolicy: {{ .Values.node.restartPolicy }}
+      volumes:
+        - name: {{ $releaseName }}-core-config
+          configMap:
+            name: {{ $releaseName }}-core-config
+            items:
+              - key: conf
+                path: thingsboard.conf
+              - key: logback
+                path: logback.xml
+        - name: {{ $releaseName }}-node-logs
+          emptyDir: {}
+        {{- if not .Values.node.persistence.enabled }}
+        - name: {{ printf "%s-node-data" $releaseName}}
+          emptyDir: {}
+        {{- else if .Values.node.persistence.existingClaim }}
+        - name: {{ printf "%s-node-data" $releaseName}}
+          persistentVolumeClaim:
+            claimName: {{ .Values.node.persistence.existingClaim }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ printf "%s-node-data" $releaseName}}
+      spec:
+        accessModes: {{ .Values.node.persistence.accessModes }}
+        resources:
+          requests:
+            storage: {{ .Values.node.persistence.size }}
+        storageClassName: {{ ternary .Values.node.persistence.storageClass "" (empty .Values.node.persistence.storageClass) }}
+        {{- end }}
+{{- end}}

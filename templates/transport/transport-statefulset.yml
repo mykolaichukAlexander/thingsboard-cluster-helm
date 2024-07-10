@@ -1,0 +1,67 @@
+{{- $tbNamespace := .Release.Namespace -}}
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $imagePullSecret := .Values.global.imagePullSecret }}
+  {{- $releaseName := .Release.Name }}
+{{- range $kay, $transport := .Values.transports }}
+{{- if and $transport.enabled $.Values.installation.msa }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ printf "%s-%s" $releaseName $transport.name }}
+  namespace: {{$tbNamespace}}
+  labels:
+    app: {{ printf "%s-%s" $releaseName $transport.name }}
+spec:
+  serviceName: {{ printf "%s-%s" $releaseName $transport.name }}
+  podManagementPolicy: Parallel
+  replicas: {{$transport.replicas}}
+  selector:
+    matchLabels:
+      app: {{ printf "%s-%s" $releaseName $transport.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ printf "%s-%s" $releaseName $transport.name }}
+    spec:
+      imagePullSecrets:
+        - name: {{ $imagePullSecret }}
+      initContainers: {{ include "thingsboard.initcontainers" $ | indent 8 }}
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: {{ include "thingsboard.transport.image" (dict "context" $ "transportBody" $transport )}}
+          ports:
+          {{- range $transport.ports }}
+            - containerPort: {{ .value }}
+              name: {{ .name }}
+              protocol: {{.protocol | default "TCP" | toString}}
+          {{- end }}
+          resources:
+            {{- $transport.resources | toYaml | nindent 12 }}
+          env:
+            - name: TB_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          {{- range $transport.env}}
+            - name: {{.name}}
+              value: {{ .value | quote }}
+          {{- end}}
+          envFrom:
+            {{- include "thingboard.coordinator.configuration.ref" $ | indent 12 }}
+            {{- include "thingboard.queue.configuration.ref" $ | indent 12 }}
+            {{- include "thingboard.cache.configuration.ref" $ | indent 12 }}
+          volumeMounts:
+            - mountPath: /config
+              name: {{$releaseName}}-{{$transport.name}}-config
+      volumes:
+        - name: {{$releaseName}}-{{$transport.name}}-config
+          configMap:
+            name: {{$releaseName}}-{{$transport.name}}-config
+            items:
+              - key: conf
+                path: {{$releaseName}}-{{$transport.name}}.conf
+              - key: logback
+                path: logback.xml
+{{- end}}
+{{- end}}

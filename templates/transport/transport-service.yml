@@ -1,0 +1,21 @@
+{{- $tbNamespace := .Release.Namespace -}}
+  {{- $releaseName := .Release.Name }}
+{{- range $transportkey, $transport := .Values.transports }}
+{{- if and $transport.enabled $.Values.installation.msa }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ printf "%s-%s" $releaseName $transport.name }}
+  namespace: {{$tbNamespace}}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ printf "%s-%s" $releaseName $transport.name }}
+  ports:
+  {{- range $transport.ports }}
+    - port: {{ .value }}
+      name: {{ .name }}
+      protocol: {{.protocol | default "TCP" | toString}}
+  {{- end }}
+{{- end}}
+{{- end}}

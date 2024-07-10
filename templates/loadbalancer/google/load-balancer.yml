@@ -1,0 +1,24 @@
+{{- $namespace := .Release.Namespace -}}
+{{- if .Values.gcloud.loadBalancer.enabled }}
+ {{- range $key, $transport := .Values.transports }}
+  {{- if and $transport.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{$.Release.Name}}-{{ $transport.name }}-loadbalancer
+  namespace: {{ $namespace }}
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: {{$.Release.Name}}-{{ $transport.name }}
+  ports:
+    {{- range $transport.ports }}
+    - port: {{ .value }}
+      targetPort: {{ .value }}
+      name: {{ .name }}
+      protocol: {{ .protocol | default "TCP" | toString }}
+    {{- end }}
+  {{- end}}
+ {{- end}}
+{{- end }}

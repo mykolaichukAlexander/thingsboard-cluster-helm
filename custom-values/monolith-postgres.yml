@@ -1,0 +1,19 @@
+installation:
+  msa: false
+  pe: false
+internalKafka:
+  enabled: false
+internalRedis:
+  enabled: false
+internalZookeeper:
+  enabled: false
+internalPostgresql:
+  enabled: true
+  auth:
+    username: "root"
+    password: "root"
+    database: "thingsboard"
+
+defaultIngress:
+  enabled: true
+

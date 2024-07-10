@@ -1,0 +1,704 @@
+# Default values for thingsboard.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+global:
+  # Pull secret that will be used to get docker thingsboard images.
+  imagePullSecret: regcred
+  # This repository option has a second priority and will be used for Tb-Node (if msa: false)
+  # or Tb-Core and Tb-Rule-Engine at the same time. If you need to get different images for
+  # different tb-services types you can set node.image.repository and engine.image.repository -
+  # this option has first priority and will override global.repository.
+  repository: ""
+  # As in case of global.repository this options has second priority and works in the same way.
+  tag: "3.6.0"
+
+# This category will config Thingsboard cluster state
+installation:
+  # Switch on Professional Edition mode.
+  # For more information please visit https://thingsboard.io/docs/getting-started-guides/helloworld-pe/.
+  pe: false
+  # If you plan to use the Professional Edition version of Thingsboard you need to provide this key.
+  # You can get this key from Thingsboard team. In the case of Community Edition, you can skip this field empty.
+  licenseKey: ""
+  # This field is responsible for the installation process of Thingsboard. The installation process will create all needed
+  # database tables (in PostgreSQL in case of only "Postgres Mode" for Timeseries. Or in PostgreSQL in Cassandra)
+  # in the case of "hybrid mode". For more information on how to choose the most suitable option for you please visit
+  # https://thingsboard.io/docs/pe/reference/#sql-vs-nosql-vs-hybrid-database-approach.
+  installTb: false
+  # Works only with installation.installTb: true. This option will load into database some prepared data for you.
+  loadDemo: false
+  # Thingsboard can run in different configurations to meet different needs. To decide in what configuration you should
+  # run your cluster please visit https://thingsboard.io/docs/pe/reference/#monolithic-vs-microservices-architecture.
+  msa: true
+
+# Credentials that will use for getting images. By default, all images in this chart are open. But in case of using custom
+# code images, this auth will be used.
+dockerAuth:
+  registry: https://index.docker.io/v1/
+  username: ""
+  password: ""
+
+## This node category will use to configur Thingsboard node in monolith mode or core in MSA mode.
+node:
+  # Image that will use for node(core) service.
+  image:
+    # Repository option that has the highest priority and will override global.repository
+    repository:
+    # Tag option that has the highest priority and will override global.tag
+    tag:
+  imagePullPolicy: Always
+  # Statefulset option for node service
+  statefulSet:
+    # Replica count for node(core) services
+    replicas: 1
+  # List of ports for node(core) service, you can just add your custom ports as list entries and their will be rendered
+  # and added to node manifest
+  ports:
+    - name: http
+      value: 8080
+    - name: edge
+      value: 7070
+    - name: grpc
+      value: 9090
+  # Node selector for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Usually it is Map type. Example:
+  # nodeSelector:
+  #    disktype: ssd
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  nodeSelector: {}
+  # Affinity for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Example:
+  # affinity:
+  #    nodeAffinity:
+  #      requiredDuringSchedulingIgnoredDuringExecution:
+  #        nodeSelectorTerms:
+  #        - matchExpressions:
+  #          - key: topology.kubernetes.io/zone
+  #            operator: In
+  #            values:
+  #            - antarctica-east1
+  #            - antarctica-west1
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  affinity: {}
+  # A Map for custom environment variable for node(core) service. If not empty, all env vars will be added on config map
+  # and will path to pods. Useful while custom developing.
+  # Example:
+  # customEnv:
+  #   TEST: test
+  customEnv: {}
+  # Default readiness probe for node service
+  readinessProbe:
+    httpGet:
+      path: /login
+      port: http
+  # Default liveness probe for node service
+  livenessProbe:
+    httpGet:
+      path: /login
+      port: http
+    initialDelaySeconds: 460
+    timeoutSeconds: 10
+  restartPolicy: Always
+  securityContext:
+    runAsUser: 799
+    runAsNonRoot: true
+    fsGroup: 799
+  # Persistence layer for node pods. In case of Professional Edition it is required for managing license. Or if you plan
+  # to use custom extensions with saving some state that need to "survive" pod lifetime events ot updates.
+  persistence:
+    enabled: true
+    existingClaim: ""
+    size: 1Gi
+    accessModes: [ "ReadWriteOnce" ]
+    storageClass:
+  # Default resources for node pods.
+  resources:
+    # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+    limits:
+      cpu: "2000m"
+      memory: 4000Mi
+    # Default requests for CPU and Memory that pods will try to use
+    requests:
+      cpu: "1000m"
+      memory: 3000Mi
+
+## This node category will use to configur Thingsboard rule engine in MSA mode.
+engine:
+  # Image that will use for rule engine service.
+  image:
+    # Repository option that has the highest priority and will override global.repository
+    repository:
+    # Tag option that has the highest priority and will override global.tag
+    tag:
+  imagePullPolicy: Always
+  # Statefulset option for rule engine service
+  statefulSet:
+    # Replica count for rule engine services
+    replicas: 1
+  # List of ports for rule engine service, you can just add your custom ports as list entries and their will be rendered
+  # and added to node manifest
+  ports:
+    - name: http
+      value: 8080
+  # Node selector for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Usually it is Map type. Example:
+  # nodeSelector:
+  #    disktype: ssd
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  nodeSelector: {}
+  # Affinity for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Example:
+  # affinity:
+  #    nodeAffinity:
+  #      requiredDuringSchedulingIgnoredDuringExecution:
+  #        nodeSelectorTerms:
+  #        - matchExpressions:
+  #          - key: topology.kubernetes.io/zone
+  #            operator: In
+  #            values:
+  #            - antarctica-east1
+  #            - antarctica-west1
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  affinity: {}
+  # A Map for custom environment variable for rule engine service. If not empty, all env vars will be added on config map
+  # and will path to pods. Useful while custom developing.
+  # Example:
+  # customEnv:
+  #   TEST: test
+  customEnv:
+  # Default readiness probe for rule engine service
+  readinessProbe:
+    tcpSocket:
+      port: 8080
+    initialDelaySeconds: 50
+    periodSeconds: 10
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 5
+  # Default liveness probe for rule engine service
+  livenessProbe:
+    tcpSocket:
+      port: 8080
+    initialDelaySeconds: 300
+    timeoutSeconds: 10
+  restartPolicy: Always
+  securityContext:
+    runAsUser: 799
+    runAsNonRoot: true
+    fsGroup: 799
+  # Persistence layer for node pods. In case of Professional Edition it is required for managing license. Or if you plan
+  # to use custom extensions with saving some state that need to "survive" pod lifetime events ot updates.
+  persistence:
+    enabled: true
+    existingClaim: ""
+    size: 1Gi
+    accessModes: [ "ReadWriteOnce" ]
+    storageClass:
+  # Default resources for rule-engine pods.
+  resources:
+    # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+    limits:
+      cpu: "2000m"
+      memory: 4000Mi
+    # Default requests for CPU and Memory that pods will try to use
+    requests:
+      cpu: "1000m"
+      memory: 3000Mi
+
+
+# Thingsboard Web Report Service configuration section
+report:
+  # Enable of disable web report service in cluster
+  enabled: true
+  # Image configuration
+  image:
+    # Repository that will be used for web report service. If blank - default repository will be used.
+    repository:
+    # Tag that will be used for web report service. If blank - default tag will be used.
+    tag:
+  deployment:
+    # Replicas number for web report service
+    replicas: 1
+  # Default resources for web report service
+  resources:
+    # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+    limits:
+      cpu: "100m"
+      memory: 100Mi
+    # Default requests for CPU and Memory that pods will try to use
+    requests:
+      cpu: "100m"
+      memory: 100Mi
+
+# Thingsboard Web UI Service configuration section
+web:
+  # Enable of disable web report service in cluster.
+  enabled: true
+  image:
+    # Repository that will be used for web ui service. If blank - default repository will be used
+    repository:
+    # Tag that will be used for web ui service. If blank - default tag will be used
+    tag:
+  deployment:
+    # Default replica count for service
+    replicas: 1
+  # Node selector for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Usually it is Map type. Example:
+  # nodeSelector:
+  #    disktype: ssd
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  nodeSelector: {}
+  # Affinity for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Example:
+  # affinity:
+  #    nodeAffinity:
+  #      requiredDuringSchedulingIgnoredDuringExecution:
+  #        nodeSelectorTerms:
+  #        - matchExpressions:
+  #          - key: topology.kubernetes.io/zone
+  #            operator: In
+  #            values:
+  #            - antarctica-east1
+  #            - antarctica-west1
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  affinity: {}
+  # Default resources for web ui service
+  resources:
+    # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+    limits:
+      cpu: "100m"
+      memory: 100Mi
+    # Default requests for CPU and Memory that pods will try to use
+    requests:
+      cpu: "100m"
+      memory: 100Mi
+
+# Thingsboard JavaScript Executor Service configuration section
+# JavaScripts executor executes all js scripts on Rule Engine and Integrations etc.
+# Now Thingsboard has alternative such as TBEL (https://thingsboard.io/docs/user-guide/tbel/).
+# But if you plan use JavaScript js.enabled should be true
+js:
+  # Enable of disable js-executor service in cluster.
+  enabled: false
+  image:
+    # Repository that will be used for js-executor service. If blank - default repository will be used
+    repository:
+    # Tag that will be used for js-executor service. If blank - default tag will be used
+    tag:
+  deployment:
+    # Default js-executor service replica count
+    replicas: 5
+  # Node selector for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Usually it is Map type. Example:
+  # nodeSelector:
+  #    disktype: ssd
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  nodeSelector: {}
+  # Affinity for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Example:
+  # affinity:
+  #    nodeAffinity:
+  #      requiredDuringSchedulingIgnoredDuringExecution:
+  #        nodeSelectorTerms:
+  #        - matchExpressions:
+  #          - key: topology.kubernetes.io/zone
+  #            operator: In
+  #            values:
+  #            - antarctica-east1
+  #            - antarctica-west1
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  affinity: {}
+  # Default resources for js-executor service
+  resources:
+    # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+    limits:
+      cpu: "100m"
+      memory: 400Mi
+    # Default requests for CPU and Memory that pods will try to use
+    requests:
+      cpu: "100m"
+      memory: 100Mi
+
+
+# Transport configuration. (more on https://thingsboard.io/docs/reference/msa/)
+# Thingsboard has various options for different protocols that can help you connect devices with
+# Thingsboard platform. In this configuration transports it is a Map like structure. Example:
+# transports:
+#   http: {transport config object}
+#   mqtt: {transport config object}
+transports:
+  # Http transport config (https://thingsboard.io/docs/reference/http-api/)
+  http:
+    # Name that will be used for kubernetes resources like sts and services
+    name: http-transport
+    # Enable or disable this transport into your cluster
+    enabled: false
+    image:
+      # Transport custom repository. When blank - default repository will be used
+      repository:
+      # Transport custom tag. When blank - default repository will be used
+      tag:
+    # Transport replicas
+    replicas: 1
+    # Transport ports that container will use. Be sure that this port will match with HTTP_BIND_PORT in env variables
+    ports:
+      - name: http
+        value: 8080
+    # Environment variables for http transport service
+    env:
+      - name: HTTP_BIND_ADDRESS
+        value: "0.0.0.0"
+      - name: HTTP_BIND_PORT
+        value: "8080"
+      - name: HTTP_REQUEST_TIMEOUT
+        value: "60000"
+    # Default resources
+    resources:
+      # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+      limits:
+        cpu: "1000m"
+        memory: 2000Mi
+      # Default requests for CPU and Memory that pods will try to use
+      requests:
+        cpu: "500m"
+        memory: 500Mi
+  coap:
+    # Name that will be used for kubernetes resources like sts and services
+    name: coap-transport
+    # Enable or disable this transport into your cluster
+    enabled: false
+    image:
+      # Transport custom repository. When blank - default repository will be used
+      repository:
+      # Transport custom tag. When blank - default repository will be used
+      tag:
+    # Transport replicas
+    replicas: 1
+    # Transport ports that container will use. Be sure that this port will match with COAP_BIND_PORT in env variables
+    ports:
+      - name: coap
+        value: 5683
+    # Environment variables for coap transport service
+    env:
+      - name: COAP_BIND_ADDRESS
+        value: "0.0.0.0"
+      - name: COAP_BIND_PORT
+        value: "5683"
+      - name: COAP_TIMEOUT
+        value: "10000"
+    # Default resources
+    resources:
+      # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+      limits:
+        cpu: "1000m"
+        memory: 2000Mi
+      # Default requests for CPU and Memory that pods will try to use
+      requests:
+        cpu: "500m"
+        memory: 500Mi
+  lwm2m:
+    # Name that will be used for kubernetes resources like sts and services
+    name: lwm2m-transport
+    # Enable or disable this transport into your cluster
+    enabled: false
+    image:
+      # Transport custom repository. When blank - default repository will be used
+      repository:
+      # Transport custom tag. When blank - default repository will be used
+      tag:
+    # Transport replicas
+    replicas: 1
+    # Transport ports that container will use.
+    ports:
+      - name: lwm2m
+        value: 5685
+      - name: lwm2m-bs
+        value: 5687
+    env:
+    # Default resources
+    resources:
+      # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+      limits:
+        cpu: "1000m"
+        memory: 2000Mi
+      # Default requests for CPU and Memory that pods will try to use
+      requests:
+        cpu: "500m"
+        memory: 500Mi
+  snmp:
+    # Name that will be used for kubernetes resources like sts and services
+    name: snmp-transport
+    # Enable or disable this transport into your cluster
+    enabled: false
+    image:
+      # Transport custom repository. When blank - default repository will be used
+      repository:
+      # Transport custom tag. When blank - default repository will be used
+      tag:
+    # Transport replicas
+    replicas: 1
+    ports:
+    env:
+    # Default resources
+    resources:
+      # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+      limits:
+        cpu: "1000m"
+        memory: 2000Mi
+      # Default requests for CPU and Memory that pods will try to use
+      requests:
+        cpu: "500m"
+        memory: 500Mi
+  mqtt:
+    # Name that will be used for kubernetes resources like sts and services
+    name: mqtt-transport
+    # Enable or disable this transport into your cluster
+    enabled: false
+    image:
+      # Transport custom repository. When blank - default repository will be used
+      repository:
+      tag:
+    # Transport replicas
+    replicas: 1
+    # Transport ports that container will use.
+    ports:
+      - name: mqtt
+        value: 1883
+    env:
+    # Default resources
+    resources:
+      # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+      limits:
+        cpu: "1000m"
+        memory: 2000Mi
+      # Default requests for CPU and Memory that pods will try to use
+      requests:
+        cpu: "500m"
+        memory: 500Mi
+
+
+
+# When you already deploy redis by yourself or using some sort of service this section should be filled.
+# By external means that redis will be managed  by not this chart.
+externalRedis:
+  # If this option is true, chart will know that it should expect external redis. external options are the highest
+  # in priority and other redis options like internalRedis and internalRedisCluster will be ignored.
+  enabled: false
+  # Hosts list for external redis. Format hust:port
+  hosts: ""
+  # Let to know to Thingsboard that redis is running in cluster mode
+  cluster: false
+  # Password for external redis if expected
+  password: "testPassword"
+
+# Option if you want to use internal redis that will be up and run by this chart. This section will bring
+# bitnami/redis (https://artifacthub.io/packages/helm/bitnami/redis) into this chart. If you want to add some extra
+# configuration, you just can put it with key internalRedis, and they will be passed to bitnami/redis chart
+internalRedis:
+  # Enable or disable bitnami/redis into your cluster
+  enabled: true
+  # Default name override for bitnami/redis
+  nameOverride: "redis"
+  # Architecture for bitnami/redis. Allowed values: standalone or replication
+  architecture: standalone
+  # Default redis port
+  port: 6379
+  auth:
+    # Enable or disable bitnami/redis auth
+    enabled: true
+    # Default redis password
+    password: "testPassword"
+
+
+# Option if you want to use internal redis cluster that will be up and run by this chart. This section will bring
+# bitnami/redis-cluster (https://artifacthub.io/packages/helm/bitnami/redis-cluster) into this chart. If you want to add some extra
+# configuration, you just can put it with key internalRedisCluster, and they will be passed to bitnami/redis-cluster chart.
+internalRedisCluster:
+  # Enable or disable bitnami/redis-cluster into your cluster
+  enabled: false
+  # Default name override for bitnami/redis-cluster
+  nameOverride: "redis"
+  # Enable or disable bitnami/redis-cluster auth
+  usePassword: true
+  # Default redis password
+  password: "testPassword"
+  # Default redis port
+  port: "6379"
+
+
+# When you already deploy postgresql by yourself or using some sort of service this section should be filled.
+# By external means that postgresql will be managed by not this chart.
+externalPostgresql:
+  # Postgresql server host
+  host: ""
+  # Postgresql server port
+  port: 5432
+  # Postgresql server user
+  username: "root"
+  # Postgresql server user password
+  password: "root"
+  # Postgresql database for Thingsboard
+  database: "thingsboard"
+
+# Option if you want to use internal Postgresql that will be up and run by this chart. This section will bring
+# bitnami/postgresql (https://artifacthub.io/packages/helm/bitnami/postgresql) into this chart. If you want to add some extra
+# configuration, you just can put it with key internalPostgresql, and they will be passed to bitnami/postgresql chart
+internalPostgresql:
+  # If enabled this option bitnami/postgresql will be deployed. Please note that internalPostgresql.enabled: true option
+  # means that you will not use externalPostgresql and want to deploy bitnami/postgresql within this chart
+  enabled: true
+  # Default name override for bitnami/postgresql
+  nameOverride: "postgresql"
+  # Architecture for bitnami/postgresql. Allowed values: standalone or replication
+  architecture: standalone
+  # Enable or disable bitnami/postgresql auth
+  auth:
+    # Postgresql server user
+    username: "root"
+    # Postgresql server user password
+    password: "root"
+    # Postgresql database for Thingsboard
+    database: "thingsboard"
+
+
+# When you already deploy kafka by yourself or using some sort of service this section should be filled.
+# By external means that kafka will be managed by not this chart.
+externalKafka:
+  # If this option is true, chart will know that it should expect external kafka. external options are the highest
+  # in priority and other kafka options like internalKafka will be ignored.
+  enabled: false
+  # Kafka connection hosts
+  hosts: "kafka:9042"
+  # Replica count for kafka, how much kafka instances in cluster
+  replicaCount: 1
+
+# Option if you want to use internal Kafka that will be up and run by this chart. This section will bring
+# bitnami/kafka (https://artifacthub.io/packages/helm/bitnami/kafka) into this chart. If you want to add some extra
+# configuration, you just can put it with key internalKafka, and they will be passed to bitnami/kafka chart
+internalKafka:
+  # If enabled this option bitnami/kafka will be deployed. Please note that externalKafka.enabled: true will override
+  # this option and chart will expect that you already have configured and running kafka
+  enabled: true
+  # Default name override for bitnami/kafka
+  nameOverride: "kafka"
+  # Default replica count for bitnami/kafka
+  replicaCount: 1
+
+  service:
+    headless:
+      publishNotReadyAddresses: true
+
+# When you already deploy Zookeeper by yourself or using some sort of service this section should be filled.
+# By external means that zookeeper will be managed by not this chart.
+# If msa mode on, externalZookeeper.enabled = true or internalZookeeper.enabled = true  is required
+externalZookeeper:
+  # If this option is true, chart will know that it should expect external kafka. external options are the highest
+  # in priority and other zookeeper options like internalZookeeper will be ignored.
+  enabled: false
+  # External zookeeper host
+  host:
+  # External zookeeper port
+  port:
+
+# Option if you want to use internal Zookeeper that will be up and run by this chart. This section will bring
+# bitnami/zookeeper (https://artifacthub.io/packages/helm/bitnami/zookeeper) into this chart. If you want to add some extra
+# configuration, you just can put it with key internalZookeeper, and they will be passed to bitnami/zookeeper chart
+internalZookeeper:
+  # If enabled this option bitnami/zookeeper will be deployed. Please note that externalZookeeper.enabled: true will override
+  # this option and chart will expect that you already have configured and running zookeeper
+  enabled: true
+  # Default name override for bitnami/zookeeper
+  nameOverride: "zookeeper"
+
+
+# When you already deploy Cassandra by yourself or using some sort of service this section should be filled.
+# By external means that cassandra will be managed by not this chart
+# Thingsboard keyspace should be created before install.
+# If externalCassandra.enabled = false and internalCassandra.enabled = false that Thingsboard will be configured to work
+# only with Postgresql
+externalCassandra:
+  # If this option is true, chart will know that it should expect external cassandra. external options are the highest
+  # in priority and other cassandra options like internalCassandra will be ignored.
+  enabled: false
+  # External cassandra host
+  host: "cassandra"
+  # External cassandra port
+  port: "9042"
+  # External cassandra user name
+  user: cassandra
+  # External cassandra password
+  password: cassandra
+  # External cassandra datacenter
+  datacenter: "dc1"
+
+# Option if you want to use internal Cassandra that will be up and run by this chart. This section will bring
+# bitnami/cassandra (https://artifacthub.io/packages/helm/bitnami/cassandra) into this chart. If you want to add some extra
+# configuration, you just can put it with key internalCassandra, and they will be passed to bitnami/cassandra chart
+# If externalCassandra.enabled = false and internalCassandra.enabled = false that Thingsboard will be configured to work
+# only with Postgresql
+internalCassandra:
+  # If enabled this option bitnami/zookeeper will be deployed. Please note that externalCassandra.enabled: true will override
+  # this option and chart will expect that you already have configured and running cassandra
+  enabled: false
+  # Default Replication Strategy for Keyspace that will be created
+  replicationStrategy: SimpleStrategy
+  # Default Replication count
+  replicaCount: 1
+  # Default cluster configuration
+  cluster:
+    # Cassandra datacenter name
+    datacenter: datacenter1
+  # Default cassandra override name
+  nameOverride: "cassandra"
+  # Config map with init keyspace cql script
+  initDBConfigMap: cassandra-init
+  # Config cassandra auth
+  dbUser:
+    user: cassandra
+    password: cassandra
+
+awscontroller:
+  enabled: false
+#  roleARN: ""
+  clusterName: "thingsboard-helm"
+  serviceAccount:
+    create: false
+    name: tb-cluster-load-balancer-controller
+  cert:
+    enabled: false
+    arn:
+    hosts:
+      - www.example.com
+
+gcloud:
+  loadBalancer:
+    enabled: false
+    staticAddressName: thingsboard-http-lb-address
+    cert:
+      enabled: false
+      hosts:
+        - www.example.com
+
+azure:
+  loadbalancer:
+    enabled: false
+    cert:
+      enabled: false
+      certSecret: akssecret
+      hosts:
+        - www.example.com
+
+# This ingress doesn't have any of special configuration and can apply for test or fast installation
+# Full responsibility on Kubernetes service provider
+defaultIngress:
+  enabled: false

@@ -1,0 +1,45 @@
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $namespace := .Release.Namespace }}
+  {{- $releaseName := .Release.Name }}
+  {{- if and .Values.js.enabled .Values.installation.msa }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{$releaseName}}-js-executor
+  namespace: {{ $namespace }}
+spec:
+  replicas: {{.Values.js.deployment.replicas}}
+  selector:
+    matchLabels:
+      app: {{$releaseName}}-js-executor
+  template:
+    metadata:
+      labels:
+        app: {{$releaseName}}-js-executor
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecret }}
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: {{ include "thingsboard.js.image" . }}
+          resources:
+          {{- toYaml .Values.js.resources | nindent 12}}
+          env:
+            - name: REMOTE_JS_EVAL_REQUEST_TOPIC
+              value: "js_eval.requests"
+            - name: LOGGER_LEVEL
+              value: "info"
+            - name: LOG_FOLDER
+              value: "logs"
+            - name: LOGGER_FILENAME
+              value: "tb-js-executor-%DATE%.log"
+            - name: DOCKER_MODE
+              value: "true"
+            - name: SCRIPT_BODY_TRACE_FREQUENCY
+              value: "1000"
+          envFrom:
+            - configMapRef:
+                name: {{$releaseName}}-kafka-config
+      restartPolicy: Always
+  {{- end }}

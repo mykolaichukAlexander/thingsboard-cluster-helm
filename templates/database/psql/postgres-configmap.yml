@@ -1,0 +1,19 @@
+{{- $namespace := .Release.Namespace -}}
+{{- $releaseName := .Release.Name }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{$releaseName}}-postgres-config
+  namespace: {{ $namespace }}
+  labels:
+    name: {{$releaseName}}-postgres-config
+data:
+  SPRING_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+  {{- if .Values.internalPostgresql.enabled }}
+  SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s-%s:5432/%s" .Release.Name .Values.internalPostgresql.nameOverride .Values.internalPostgresql.auth.database }}
+  SPRING_DATASOURCE_USERNAME: {{ .Values.internalPostgresql.auth.username }}
+  {{- else }}
+  SPRING_DATASOURCE_URL: {{ printf "jdbc:postgresql://%s:5432/%s" .Values.externalPostgresql.host .Values.externalPostgresql.database }}
+  SPRING_DATASOURCE_USERNAME: {{ .Values.externalPostgresql.username }}
+  {{- end}}
+

@@ -1,0 +1,36 @@
+installation:
+  licenseKey: ""
+  msa: true
+  pe: false
+transports:
+  http:
+    enabled: true
+  mqtt:
+    enabled: true
+report:
+  enabled: true
+js:
+  enabled: true
+  deployment:
+    replicaCount: 2
+internalPostgresql:
+  enabled: true
+  auth:
+    username: "root"
+    password: "root"
+    database: "thingsboard"
+
+internalCassandra:
+  enabled: true
+  replicaCount: 3
+
+internalRedisCluster:
+  enabled: true
+  cluster:
+    nodes: 6
+
+internalKafka:
+  enabled: true
+
+defaultIngress:
+  enabled: true

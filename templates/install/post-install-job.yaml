@@ -1,0 +1,53 @@
+{{- $namespace := .Release.Namespace -}}
+  {{- $appVersion := .Chart.AppVersion -}}
+  {{- $releaseName := .Release.Name }}
+  {{- if and .Values.installation.installTb (not .Release.IsUpgrade)}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{$releaseName}}-install-pod
+  namespace: {{ $namespace }}
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+  labels:
+    app: install-job
+spec:
+  imagePullSecrets:
+    - name: regcred
+  volumes:
+    - name: install-config
+      configMap:
+        name: {{ printf "%s-install-config" .Release.Name }}
+        items:
+          - key: conf
+            path: thingsboard.conf
+          - key: logback
+            path: logback.xml
+    - name: {{$releaseName}}-node-logs
+      emptyDir: {}
+  restartPolicy: OnFailure
+  containers:
+    - name: {{$releaseName}}-db-setup
+      imagePullPolicy: {{ .Values.node.imagePullPolicy }}
+      image: {{ include "thingsboard.node.image" . }}
+      env:
+        - name: TB_SERVICE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: INSTALL_TB
+          value: "true"
+        {{- if .Values.installation.loadDemo}}
+        - name: LOAD_DEMO
+          value: "true"
+        {{- end }}
+      envFrom:
+        {{- include "thingboard.cassandra.configuration.ref" . | indent 12 }}
+        {{- include "thingboard.postgres.configuration.ref" . | indent 12 }}
+      volumeMounts:
+        - mountPath: /config
+          name: install-config
+        - mountPath: /var/log/thingsboard
+          name: {{$releaseName}}-node-logs
+  {{- end }}

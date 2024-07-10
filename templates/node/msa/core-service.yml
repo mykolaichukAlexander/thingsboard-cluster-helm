@@ -1,0 +1,19 @@
+{{- $namespace := .Release.Namespace -}}
+{{- $releaseName := .Release.Name }}
+  {{- if .Values.installation.msa }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "thingsboard.core.label" . }}
+  namespace: {{ $namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "thingsboard.core.label" . }}
+  ports:
+    {{- range .Values.node.ports }}
+    - port: {{ .value }}
+      name: {{ .name }}
+      protocol: {{ .protocol | default "TCP" | toString }}
+      {{- end}}
+  {{- end }}

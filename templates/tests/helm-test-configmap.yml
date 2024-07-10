@@ -1,0 +1,23 @@
+{{- $tbNodeHost := include "thingsboard.node.host" . -}}
+{{- $tbTSHost := include "thingsboard.ts.host" .  -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-helm-test-configmap
+data:
+  helm-test.http: |-
+  {{- .Files.Get "scripts/helm-test.http" | nindent 4 }}
+  env.json: |-
+      {
+        "test": {
+          "TB_HOST": "{{ printf "http://%s:8080/" $tbNodeHost }}",
+          "TB_TS_HOST": "{{ printf "http://%s:8080/" $tbTSHost }}",
+          "SYSADMIN_LOGIN": "sysadmin@thingsboard.org",
+          "SYSADMIN_PASSWORD": "sysadmin",
+          "TEST_TENANT_NAME": "Helm Test Tenant",
+          "TEST_TENANT_ADMIN_EMAIL": "test_tenant_admin@thingsboard.org",
+          "TEST_TENANT_ADMIN_PASSWORD": "qwerty123",
+          "TEST_DEVICE_NAME": "testDevice"
+        }
+      }

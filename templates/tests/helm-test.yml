@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{.Release.Name}}-test
+  labels:
+    app: {{.Release.Name}}-test
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  containers:
+    - name: wget
+      image: jetbrains/intellij-http-client
+      imagePullPolicy: IfNotPresent
+      args:
+        - helm-test.http
+        - --env-file
+        - env.json
+        - --env
+        - test
+      volumeMounts:
+        - name: {{ .Release.Name }}-helm-test-configmap
+          mountPath: /workdir
+  volumes:
+    - name: {{ .Release.Name }}-helm-test-configmap
+      configMap:
+        name: {{ .Release.Name }}-helm-test-configmap
+        defaultMode: 0777
+        items:
+          - key: helm-test.http
+            path: helm-test.http
+          - key: env.json
+            path: env.json
+  restartPolicy: Never

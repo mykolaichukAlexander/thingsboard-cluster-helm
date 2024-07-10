@@ -1,0 +1,24 @@
+{{- $namespace := .Release.Namespace -}}
+{{- if .Values.defaultIngress.enabled }}
+ {{- range $key, $transport := .Values.transports }}
+{{- if $transport.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{$transport.name}}-loadbalancer
+  namespace: {{$namespace}}
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: {{ ternary (printf "%s-transprt" $transport.name) (include "thingsboard.node.label" $) $.Values.installation.msa }}
+  ports:
+    {{- range $transport.ports }}
+    - port: {{ .value }}
+      targetPort: {{ .value }}
+      name: {{ .name }}
+      protocol: {{ .protocol | default "TCP" | toString }}
+    {{- end }}
+ {{- end}}
+{{- end}}
+  {{- end }}

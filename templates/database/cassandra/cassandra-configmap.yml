@@ -1,0 +1,25 @@
+{{- $namespace := .Release.Namespace -}}
+  {{- $releaseName := .Release.Name }}
+  {{- if or .Values.internalCassandra.enabled .Values.externalCassandra.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{$releaseName}}-cassandra-config
+  namespace: {{ $namespace }}
+  labels:
+    name: {{$releaseName}}-cassandra-config
+data:
+  DATABASE_TS_TYPE: cassandra
+  CASSANDRA_USE_CREDENTIALS: "true"
+  CASSANDRA_READ_CONSISTENCY_LEVEL: "LOCAL_QUORUM"
+  CASSANDRA_WRITE_CONSISTENCY_LEVEL: "LOCAL_QUORUM"
+  {{- if .Values.internalCassandra.enabled }}
+  CASSANDRA_URL: {{ printf "%s-%s:9042" .Release.Name .Values.internalCassandra.nameOverride }}
+  CASSANDRA_LOCAL_DATACENTER: {{ .Values.internalCassandra.cluster.datacenter  }}
+  CASSANDRA_USERNAME: {{ .Values.internalCassandra.dbUser.user }}
+  {{- else}}
+  CASSANDRA_URL: {{ printf "%s:%s" .Values.externalCassandra.host .Values.externalCassandra.port }}
+  CASSANDRA_LOCAL_DATACENTER: {{ .Values.externalCassandra.datacenter }}
+  CASSANDRA_USERNAME: {{ .Values.externalCassandra.user  }}
+  {{- end }}
+{{- end }}

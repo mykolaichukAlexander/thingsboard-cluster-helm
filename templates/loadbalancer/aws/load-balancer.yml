@@ -1,0 +1,31 @@
+{{- $namespace := .Release.Namespace -}}
+{{- if .Values.awscontroller.enabled }}
+{{- range $key, $transport := .Values.transports }}
+{{- if and $transport.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{$.Release.Name}}-{{ $transport.name }}-loadbalancer
+  namespace: {{$namespace}}
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ThingsBoardClusterELB=ThingsBoard{{$transport.name}}
+    {{- if eq $key "mqtt"}}
+    service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: "stickiness.enabled=true,stickiness.type=source_ip"
+    {{- end}}
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: {{$.Release.Name}}-{{ $transport.name }}
+  ports:
+    {{- range $transport.ports }}
+    - port: {{ .value }}
+      targetPort: {{ .value }}
+      name: {{ .name }}
+      protocol: {{ .protocol | default "TCP" | toString }}
+    {{- end }}
+  {{- end}}
+{{- end}}
+{{- end }}

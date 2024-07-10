@@ -1,0 +1,55 @@
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $namespace := .Release.Namespace }}
+  {{- $releaseName := .Release.Name }}
+  {{- if and .Values.web.enabled .Values.installation.msa }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{$releaseName}}-web-ui
+  namespace: {{ $namespace }}
+spec:
+  replicas: {{.Values.web.deployment.replicas}}
+  selector:
+    matchLabels:
+      app: {{$releaseName}}-web-ui
+  template:
+    metadata:
+      labels:
+        app: {{$releaseName}}-web-ui
+    spec:
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecret }}
+      affinity:
+        {{- .Values.web.affinity | toYaml | nindent 8 }}
+      containers:
+        - name: server
+          imagePullPolicy: Always
+          image: {{ include "thingsboard.web.image" . }}
+          ports:
+            - containerPort: 8080
+              name: http
+          resources:
+          {{- toYaml .Values.web.resources | nindent 12 }}
+          env:
+            - name: HTTP_BIND_ADDRESS
+              value: "0.0.0.0"
+            - name: HTTP_BIND_PORT
+              value: "8080"
+            - name: TB_ENABLE_PROXY
+              value: "false"
+            - name: LOGGER_LEVEL
+              value: "info"
+            - name: LOG_FOLDER
+              value: "logs"
+            - name: LOGGER_FILENAME
+              value: "tb-web-ui-%DATE%.log"
+            - name: DOCKER_MODE
+              value: "true"
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 120
+            timeoutSeconds: 10
+      restartPolicy: Always
+  {{- end }}

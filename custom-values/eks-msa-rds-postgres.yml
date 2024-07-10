@@ -1,0 +1,46 @@
+installation:
+  msa: true
+  pe: false
+
+#This is monolith example install so Kafka, Redis and Zookeeper should be off, but because they enabled by default
+# in this case we should explicitly switch them off
+internalKafka:
+  enabled: true
+internalRedis:
+  enabled: true
+internalZookeeper:
+  enabled: true
+
+internalPostgresql:
+  enabled: false
+
+# This rds Instance was created before. Make sure your nodes in cluster can access
+# RDS instance , you need to create new inbound rule from cluster security group to security group of Postgres RDS (https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.Scenarios.html fpr more details)
+# And auth.database in this case should be created before start
+externalPostgresql:
+  # Postgresql server host
+  host: ""
+  # Postgresql server port
+  port: 5432
+  # Postgresql server user
+  username: "postgres"
+  # Postgresql server user password
+  password: "qwerty123"
+  # Postgresql database for Thingsboard
+  database: "thingsboard"
+
+node:
+  statefulSet:
+    replicas: 2
+
+engine:
+  statefulSet:
+    replicas: 2
+
+awscontroller:
+  enabled: true
+  clusterName: "super-msa-helm-testing"
+  serviceAccount:
+    create: true
+    name: tb-cluster-load-balancer-controller
+

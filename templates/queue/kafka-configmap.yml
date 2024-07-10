@@ -1,0 +1,22 @@
+{{- $namespace := .Release.Namespace -}}
+  {{- $releaseName := .Release.Name }}
+{{- if or .Values.internalKafka.enabled .Values.externalKafka.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{$releaseName}}-kafka-config
+  namespace: {{ $namespace }}
+  labels:
+    name: {{$releaseName}}-kafka-config
+data:
+  TB_QUEUE_TYPE: kafka
+  {{- if .Values.externalKafka.enabled }}
+  TB_KAFKA_SERVERS: {{ .Values.externalKafka.hosts }}
+  TB_QUEUE_KAFKA_REPLICATION_FACTOR: {{ ternary 1 (sub (.Values.externalKafka.replicaCount | int64)  1) (le (.Values.externalKafka.replicaCount | int64) 1 ) quote }}
+  TB_KAFKA_ACKS: "1"
+  {{- else }}
+  TB_KAFKA_SERVERS: {{ printf "%s-%s-headless:9092" .Release.Name .Values.internalKafka.nameOverride | quote }}
+  TB_QUEUE_KAFKA_REPLICATION_FACTOR: {{ (ternary 1 (sub (.Values.internalKafka.replicaCount | int64)  1) (le (.Values.internalKafka.replicaCount | int64) 1 )) | toString | quote}}
+  TB_KAFKA_ACKS: {{ 1 | quote }}
+  {{- end}}
+{{- end}}

@@ -1,0 +1,217 @@
+### Get sysadmin token
+POST {{TB_HOST}}/api/auth/login
+Content-Type: application/json
+
+{"username":"{{SYSADMIN_LOGIN}}", "password":"{{SYSADMIN_PASSWORD}}"}
+
+> {%
+    client.test("Get Sysadmin token", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("sysadmin_token", response.body['token'])
+    client.log("Sysadmin authorized")
+%}
+
+### Create Test Tenant
+POST {{TB_HOST}}/api/tenant
+Content-Type: application/json
+X-Authorization: Baerer {{sysadmin_token}}
+
+{"title":"{{TEST_TENANT_NAME}}","additionalInfo":{"description":"Tenant for testing install","allowWhiteLabeling":true,"allowCustomerWhiteLabeling":true,"homeDashboardId":null,"homeDashboardHideToolbar":true}}
+
+> {%
+    client.test("Create test tenant", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("test_tenant_id", response.body['id']['id'])
+    client.log("Create test tenant finished : " + response['title'])
+%}
+
+
+### Create Test Tenant Admin
+POST {{TB_HOST}}/api/user?sendActivationMail=false
+Content-Type: application/json
+X-Authorization: Baerer {{sysadmin_token}}
+
+{
+  "email": "{{TEST_TENANT_ADMIN_EMAIL}}",
+  "additionalInfo": {
+    "description": "",
+    "defaultDashboardId": null,
+    "defaultDashboardFullscreen": false,
+    "homeDashboardId": null,
+    "homeDashboardHideToolbar": true
+  },
+  "authority": "TENANT_ADMIN",
+  "tenantId": {
+    "entityType": "TENANT",
+    "id": "{{test_tenant_id}}"
+  },
+  "customerId": {
+    "entityType": "CUSTOMER",
+    "id": "13814000-1dd2-11b2-8080-808080808080"
+  }
+}
+
+> {%
+    client.test("Create test tenant admin", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("test_tenant_admin_id", response.body['id']['id'])
+    client.log("Create test tenant admin finished : " + response['email'])
+%}
+
+
+### Get Test Tenant Admin Activation Link
+GET {{TB_HOST}}/api/user/{{test_tenant_admin_id}}/activationLink
+Content-Type: application/json
+X-Authorization: Baerer {{sysadmin_token}}
+
+
+> {%
+    client.test("Get test tenant admin activation link", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("test_tenant_admin_activation_link", response.body.split('activateToken=')[1])
+    client.log("Get test tenant admin activation link finished : " + response.body.split('activateToken=')[1])
+%}
+
+
+
+### Activate Test Tenant Admin
+POST {{TB_HOST}}/api/noauth/activate?sendActivationMail=false
+Content-Type: application/json
+X-Authorization: Baerer {{sysadmin_token}}
+
+{"activateToken":"{{test_tenant_admin_activation_link}}","password":"{{TEST_TENANT_ADMIN_PASSWORD}}"}
+
+> {%
+    client.test("Activate test tenant admin user", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("test_tenant_admin_token", response.body['token'])
+    client.log("Activate test tenant admin user finished")
+%}
+
+
+
+### Create Device For Test Tenant
+POST {{TB_HOST}}/api/device
+Content-Type: application/json
+X-Authorization: Baerer {{test_tenant_admin_token}}
+
+{"name":"{{TEST_DEVICE_NAME}}","label":"{{TEST_DEVICE_NAME}}","additionalInfo":{"gateway":false,"overwriteActivityTime":false,"description":""}}
+
+> {%
+    client.test("Activate test tenant admin user", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("test_device_id", response.body['id']['id'])
+    client.log("Test device created")
+%}
+
+
+### Get Device Credentials
+GET {{TB_HOST}}/api/device/{{test_device_id}}/credentials
+Content-Type: application/json
+X-Authorization: Baerer {{test_tenant_admin_token}}
+
+> {%
+    client.test("Activate test tenant admin user", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.global.set("test_device_access_token", response.body['credentialsId'])
+    client.log("Test device get access token ok")
+%}
+
+
+
+### Push Test Telemetry To Device
+POST {{TB_TS_HOST}}/api/v1/{{test_device_access_token}}/telemetry
+Content-Type: application/json
+X-Authorization: Baerer {{test_tenant_admin_token}}
+
+{"test_telemetry_key":"test_telemetry_value"}
+
+> {%
+    client.test("Push test telemetry", function() {
+        client.assert(response.status === 200 , "Response status is not 200", response.status);
+    });
+    client.log("Telemetry pushed for device ")
+    function wait(seconds) {
+        const now = new Date().getTime()
+        const waitUntil = now + seconds * 1000
+        while (new Date().getTime() < waitUntil) {
+            // tic or maybe tac?!
+        }
+    }
+    wait(4)
+%}
+
+### Get Telemetry From Device And Validate It
+GET {{TB_HOST}}/api/plugins/telemetry/DEVICE/{{test_device_id}}/values/timeseries?keys=test_telemetry_key
+Content-Type: application/json
+X-Authorization: Baerer {{test_tenant_admin_token}}
+
+> {%
+    client.test("Get test telemetry", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.test("Validate test telemetry", function() {
+        let hasKey = response.body.hasOwnProperty('test_telemetry_key');
+        let sameValue = response.body['test_telemetry_key'][0]['value'] === 'test_telemetry_value';
+        client.assert(hasKey && sameValue, "Telemetry value missing or not match");
+    });
+    client.log("Telemetry has got for device ")
+%}
+
+
+### Delete Test Telemetry For Device
+DELETE {{TB_HOST}}/api/plugins/telemetry/DEVICE/{{test_device_id}}/timeseries/delete?keys=test_telemetry_key&deleteAllDataForKeys=true
+Content-Type: application/json
+X-Authorization: Baerer {{test_tenant_admin_token}}
+
+> {%
+    client.test("Get test telemetry", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.log("Telemetry has deleted ")
+%}
+
+<> 2023-08-16T134346.404.json
+
+### Delete Test Device
+DELETE {{TB_HOST}}/api/device/{{test_device_id}}
+Content-Type: application/json
+X-Authorization: Baerer {{test_tenant_admin_token}}
+
+> {%
+    client.test("Get test telemetry", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.log("Device has deleted ")
+%}
+
+### Delete Test Tenant Admin
+DELETE {{TB_HOST}}/api/user/{{test_tenant_admin_id}}
+Content-Type: application/json
+X-Authorization: Baerer {{sysadmin_token}}
+
+> {%
+    client.test("Get test telemetry", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.log("Tenant Admin has deleted ")
+%}
+
+### Delete Test Tenant
+DELETE {{TB_HOST}}/api/tenant/{{test_tenant_id}}
+Content-Type: application/json
+X-Authorization: Baerer {{sysadmin_token}}
+
+> {%
+    client.test("Get test telemetry", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+    client.log("Test tenant has deleted ")
+%}

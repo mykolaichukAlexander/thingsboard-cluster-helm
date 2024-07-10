@@ -1,0 +1,29 @@
+{{- $namespace := .Release.Namespace -}}
+  {{- $releaseName := .Release.Name }}
+{{- if or (or .Values.internalRedis.enabled .Values.internalRedisCluster.enabled) (or .Values.externalRedis.enabled .Values.installation.msa) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{$releaseName}}-redis-config
+  namespace: {{ $namespace }}
+  labels:
+    name: {{$releaseName}}-redis-config
+data:
+  # Make sure that the value does not contain the port (:6379).
+  CACHE_TYPE: redis
+  {{- if .Values.externalRedis.enabled }}
+      {{- if .Values.externalRedis.cluster }}
+  REDIS_CONNECTION_TYPE: "cluster"
+  REDIS_NODES: {{ printf "%s" .Values.externalRedis.hosts }}
+      {{- else }}
+  REDIS_CONNECTION_TYPE: "standalone"
+  REDIS_HOST: {{ printf "%s" .Values.externalRedis.hosts }}
+      {{- end }}
+  {{- else if .Values.internalRedisCluster.enabled }}
+  REDIS_CONNECTION_TYPE: "cluster"
+  REDIS_NODES: {{ printf "%s-%s-headless:%s" .Release.Name .Values.internalRedisCluster.nameOverride .Values.internalRedisCluster.port }}
+  {{- else }}
+  REDIS_CONNECTION_TYPE: "standalone"
+  REDIS_HOST: {{ printf "%s-%s-headless" .Release.Name .Values.internalRedis.nameOverride }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,19 @@
+{{- $namespace := .Release.Namespace -}}
+{{- $releaseName := .Release.Name }}
+{{- if .Values.installation.msa }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "thingsboard.ruleengine.label" . }}
+  namespace: {{ $namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "thingsboard.ruleengine.label" . }}
+  ports:
+    {{- range .Values.engine.ports }}
+    - port: {{ .value }}
+      name: {{ .name }}
+      protocol: {{ .protocol | default "TCP" | toString }}
+    {{- end}}
+  {{- end }}

@@ -1,0 +1,63 @@
+apiVersion: v2
+appVersion: 3.6.0
+description: Helm chart for Thingsboard cluster.
+name: thingsboard-cluster
+type: application
+version: 0.1.0
+annotations:
+  artifacthub.io/category: streaming-messaging
+  licenses: Apache-2.0
+  artifacthub.io/maintainers: |
+    - name: amykolaichuk
+      email: amykolaichuk@thingsboard.io
+  artifacthub.io/prerelease: "true"
+  artifacthub.io/logoPath: thingsboard_white.png
+home: https://thingsboard.io/
+icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
+keywords:
+  - thingsboard
+  - iot
+  - telemetry
+  - device
+  - fleet
+  - dashboards
+dependencies:
+  - name: common
+    version: 2.x.x
+    repository: oci://registry-1.docker.io/bitnamicharts
+  - name: redis
+    version: 18.1.2
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: internalRedis.enabled
+    alias: internalRedis
+  - name: redis-cluster
+    version: 9.0.7
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: internalRedisCluster
+    condition: internalRedisCluster.enabled
+  - name: postgresql
+    version: 13.0.0
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: internalPostgresql.enabled
+    alias: internalPostgresql
+  - name: kafka
+    version: 23.0.0
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: internalKafka.enabled
+    alias: internalKafka
+  - name: cassandra
+    version: 10.8.0
+    repository: oci://registry-1.docker.io/bitnamicharts
+    alias: internalCassandra
+    condition: internalCassandra.enabled
+  - name: zookeeper
+    version: 12.1.3
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: internalZookeeper.enabled
+    alias: internalZookeeper
+  - name: aws-load-balancer-controller
+    repository: https://aws.github.io/eks-charts
+    version: 1.6.1
+    alias: awscontroller
+    condition: awscontroller.enabled
+

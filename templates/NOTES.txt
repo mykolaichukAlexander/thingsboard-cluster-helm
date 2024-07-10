@@ -1,0 +1,11 @@
+Thingsboard Cluster {{ .Release.Name }} will be deployed in few minutes.
+Info:
+    Namespace: {{ .Release.Namespace }}
+    Service Provider: {{ .Values.serviceProvider }}
+    Cluster Architecture: Microservices
+    {{- if not .Values.installation.msa }}
+    Thingsboard going to run in Node Mode
+    {{- else}}
+    Thingsboard going to run Core/Rule Engine Mode
+    {{- end}}
+

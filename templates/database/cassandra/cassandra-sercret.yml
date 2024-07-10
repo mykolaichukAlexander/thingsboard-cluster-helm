@@ -1,0 +1,16 @@
+{{- $namespace := .Release.Namespace -}}
+  {{- $releaseName := .Release.Name }}
+{{- if or .Values.externalCassandra.enabled .Values.internalCassandra.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{$releaseName}}-cassandra-secret
+  namespace: {{ $namespace }}
+type: Opaque
+data:
+  {{- if .Values.internalCassandra.enabled }}
+  CASSANDRA_PASSWORD: {{ .Values.internalCassandra.dbUser.password | b64enc }}
+  {{- else}}
+  CASSANDRA_PASSWORD: {{ .Values.externalCassandra.password | b64enc }}
+  {{- end }}
+{{- end }}

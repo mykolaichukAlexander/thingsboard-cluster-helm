@@ -1,0 +1,22 @@
+{{- $namespace := .Release.Namespace -}}
+{{- if .Values.internalCassandra.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-init
+  namespace: {{ $namespace }}
+  labels:
+    name: cassandra-init
+data:
+  "01-init.cql": |
+    CREATE KEYSPACE IF NOT EXISTS thingsboard
+        WITH REPLICATION = {
+        {{- if eq .Values.internalCassandra.replicationStrategy "SimpleStrategy"}}
+            'class': 'SimpleStrategy',
+            'replication_factor': {{ .Values.internalCassandra.replicaCount | squote }}
+        {{- else }}
+             'class' : {{ .Values.internalCassandra.replicationStrategy }},
+              {{ .Values.internalCassandra.cluster.datacenter}} : {{ .Values.internalCassandra.replicaCount }}
+        {{- end}}
+            };
+{{- end}}

@@ -1,0 +1,26 @@
+{{- $namespace := .Release.Namespace -}}
+{{- if .Values.azure.loadbalancer.enabled }}
+ {{- range $key, $transport := .Values.transports }}
+  {{- if and $transport.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{$.Release.Name}}-{{ $transport.name }}-loadbalancer
+  namespace: {{ $namespace }}
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  selector:
+    app: {{$.Release.Name}}-{{ $transport.name }}
+  ports:
+    {{- range $transport.ports }}
+    - port: {{ .value }}
+      targetPort: {{ .value }}
+      name: {{ .name }}
+      protocol: {{ .protocol | default "TCP" | toString }}
+    {{- end }}
+  {{- end}}
+ {{- end}}
+{{- end }}
