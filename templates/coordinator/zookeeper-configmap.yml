@@ -13,6 +13,6 @@ data:
   {{- if .Values.externalZookeeper.enabled }}
   ZOOKEEPER_URL: {{ printf "%s:%s" .Values.externalZookeeper.host .Values.externalZookeeper.port}}
   {{- else }}
-  ZOOKEEPER_URL: {{ printf "%s-%s:2181" .Release.Name .Values.internalZookeeper.nameOverride }}
+  ZOOKEEPER_URL: {{ printf "%s-%s-headless:2181" .Release.Name .Values.internalZookeeper.nameOverride }}
   {{- end }}
 {{- end }}
