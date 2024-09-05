@@ -116,6 +116,6 @@ spec:
         resources:
           requests:
             storage: {{ .Values.node.persistence.size }}
-        storageClassName: {{ ternary .Values.node.persistence.storageClass "" (empty .Values.node.persistence.storageClass) }}
+        storageClassName: {{ ternary "" .Values.node.persistence.storageClass (empty .Values.node.persistence.storageClass) }}
         {{- end }}
 {{- end}}
