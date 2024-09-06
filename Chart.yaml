@@ -12,6 +12,25 @@ annotations:
       email: amykolaichuk@thingsboard.io
   artifacthub.io/prerelease: "true"
   artifacthub.io/logoPath: thingsboard_white.png
+  artifacthub.io/changes: |
+    - kind: fixed
+      description: Fix storage class usage in Tb-node/core/rule-engine
+      links:
+        - name: GitHub Issue 2
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/2
+        - name: GitHub Issue 3
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/3
+        - name: GitHub Issue 4
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/4
+        - name: GitHub PR
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/8
+    - kind: fixed
+      description: Fix kafka replication factor config
+      links:
+        - name: GitHub Issue 1
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/1
+        - name: GitHub Issue
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/8
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
