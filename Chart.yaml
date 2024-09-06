@@ -3,7 +3,7 @@ appVersion: 3.6.0
 description: Helm chart for Thingsboard cluster.
 name: thingsboard-cluster
 type: application
-version: 0.1.1
+version: 0.1.2
 annotations:
   artifacthub.io/category: streaming-messaging
   licenses: Apache-2.0
@@ -14,23 +14,10 @@ annotations:
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
     - kind: fixed
-      description: Fix storage class usage in Tb-node/core/rule-engine
+      description: Change order in ingress routes to prevent error while try to get /api
       links:
-        - name: GitHub Issue 2
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/2
-        - name: GitHub Issue 3
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/3
-        - name: GitHub Issue 4
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/4
         - name: GitHub PR
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/8
-    - kind: fixed
-      description: Fix kafka replication factor config
-      links:
-        - name: GitHub Issue 1
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/1
-        - name: GitHub Issue
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/8
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/10
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
