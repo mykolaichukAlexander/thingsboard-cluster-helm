@@ -932,12 +932,26 @@ For AKS if you have all needed permissions , after filling all parameters, Kuber
 
 
 
+- ### Alibaba Container Service for Kubernetes  (ACK)
+
+For ACK if you have all needed permissions , you just need to enable ALB Add-on before installing or updating chart.
+To do so, please [see](https://www.alibabacloud.com/help/en/ack/serverless-kubernetes/user-guide/manage-the-alb-ingress-controller).
+After add on enabled, ACK create all needed configs by itself. You just need to `alibabaalbcontroller.enabled` to true and 
+this chart will apply needed for Thingsboard routes.
+
+
+| Name                         |               Description               | Default Value |
+|------------------------------|:---------------------------------------:|--------------:|
+| alibabaalbcontroller.enabled | Enable ACK Ingress Load Balancer routes |         false |
+
+
+
+
+------
+
 Also chart has a default ingress option that can be applied for test purposes and will expect that service provider has implemented realization.
 ```yaml
 defaultIngress:
-  enabled: true
+  enabled: false
 ```
-
-
-
 
