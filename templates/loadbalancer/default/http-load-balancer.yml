@@ -42,18 +42,18 @@ spec:
                 name: {{ include "thingsboard.web.host" . }}
                 port:
                   number: 8080
-          - path: /
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: {{ include "thingsboard.web.host" . }}
-                port:
-                  number: 8080
           - path: /api
             pathType: Prefix
             backend:
               service:
                 name: {{ include "thingsboard.node.host" . }}
+                port:
+                  number: 8080
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: {{ include "thingsboard.web.host" . }}
                 port:
                   number: 8080
 {{- end}}
