@@ -3,7 +3,7 @@ appVersion: 3.6.0
 description: Helm chart for Thingsboard cluster.
 name: thingsboard-cluster
 type: application
-version: 0.1.2
+version: 0.1.3
 annotations:
   artifacthub.io/category: streaming-messaging
   licenses: Apache-2.0
@@ -13,11 +13,11 @@ annotations:
   artifacthub.io/prerelease: "true"
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
-    - kind: fixed
-      description: Change order in ingress routes to prevent error while try to get /api
+    - kind: added
+      description: Add basic alibaba cloud alb controller instruction and routes 
       links:
         - name: GitHub PR
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/10
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/12
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
