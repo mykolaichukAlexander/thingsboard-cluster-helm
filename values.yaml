@@ -680,6 +680,9 @@ awscontroller:
     hosts:
       - www.example.com
 
+alibabaalbcontroller:
+  enabled: false
+
 gcloud:
   loadBalancer:
     enabled: false
