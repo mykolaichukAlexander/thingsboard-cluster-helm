@@ -128,11 +128,11 @@ Return a transport image
 {{- $transportBody := index . "transportBody" -}}
 {{- if $context.Values.installation.pe }}
 {{- $repository := $transportBody.image.repository | default (printf "thingsboard/tb-pe-%s" $transportBody.name) }}
-{{- $appversion := $transportBody.image.tag | default (printf "%sPE" .Values.global.tag) | default (printf "%sPE" $context.Chart.AppVersion) }}
+{{- $appversion := $transportBody.image.tag | default (printf "%sPE" $context.Values.global.tag) | default (printf "%sPE" $context.Chart.AppVersion) }}
 {{- printf "%s:%s" $repository $appversion }}
 {{- else }}
 {{- $repository := $transportBody.image.repository | default (printf "thingsboard/tb-%s" $transportBody.name) }}
-{{- $appversion := $transportBody.image.tag | default .Values.global.tag | default (printf "%s" $context.Chart.AppVersion) }}
+{{- $appversion := $transportBody.image.tag | default $context.Values.global.tag | default (printf "%s" $context.Chart.AppVersion) }}
 {{- printf "%s:%s" $repository $appversion }}
 {{- end }}
 {{- end }}
