@@ -157,21 +157,6 @@ Return redis configurations environment variables for thingsboard services
 {{- end }}
 {{- end}}
 
-{{- define "thingboard.redis.hostports" -}}
-{{- $tbRedisHost := "" -}}
-{{- $release := .Release.Name -}}
-{{- $nameOverride := .Values.internalRedisCluster.nameOverride -}}
-{{- $port := .Values.internalRedisCluster.port -}}
-{{- range $i := until (int .Values.internalRedisCluster.cluster.nodes) -}}
-  {{- if $i -}}
-    {{- $tbRedisHost = printf "%s,%s-%s-%d:%s" $tbRedisHost $release $nameOverride $i $port -}}
-  {{- else -}}
-    {{- $tbRedisHost = printf "%s-%s-%d:%s" $release $nameOverride $i $port -}}
-  {{- end -}}
-{{- end -}}
-{{- $tbRedisHost -}}
-{{- end -}}
-
 {{/*
 Return redis password
 */}}

@@ -21,7 +21,7 @@ data:
       {{- end }}
   {{- else if .Values.internalRedisCluster.enabled }}
   REDIS_CONNECTION_TYPE: "cluster"
-  REDIS_NODES: {{ include "thingboard.redis.hostports" . }}
+  REDIS_NODES: {{ printf "%s-%s-headless:%s" .Release.Name .Values.internalRedisCluster.nameOverride .Values.internalRedisCluster.port }}
   {{- else }}
   REDIS_CONNECTION_TYPE: "standalone"
   REDIS_HOST: {{ printf "%s-%s-headless" .Release.Name .Values.internalRedis.nameOverride }}
