@@ -53,6 +53,8 @@ node:
   statefulSet:
     # Replica count for node(core) services
     replicas: 1
+
+    annotations: {}
   # List of ports for node(core) service, you can just add your custom ports as list entries and their will be rendered
   # and added to node manifest
   ports:
@@ -140,6 +142,8 @@ engine:
   statefulSet:
     # Replica count for rule engine services
     replicas: 1
+
+    annotations: {}
   # List of ports for rule engine service, you can just add your custom ports as list entries and their will be rendered
   # and added to node manifest
   ports:

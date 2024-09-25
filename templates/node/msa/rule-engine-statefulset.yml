@@ -8,7 +8,7 @@ metadata:
   name: {{ include "thingsboard.ruleengine.label" . }}
   namespace: {{ $namespace }}
   annotations:
-  {{- .Values.engine.annotations | toYaml | nindent 4}}
+  {{- .Values.engine.statefulSet.annotations | toYaml | nindent 4}}
   labels:
     app: {{ include "thingsboard.ruleengine.label" . }}
 spec:
@@ -19,6 +19,8 @@ spec:
       app: {{ include "thingsboard.ruleengine.label" . }}
   template:
     metadata:
+      annotations:
+      {{- .Values.engine.annotations | toYaml | nindent 8}}
       labels:
         app: {{ include "thingsboard.ruleengine.label" . }}
     spec:
