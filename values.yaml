@@ -90,6 +90,7 @@ node:
   # customEnv:
   #   TEST: test
   customEnv: {}
+  annotations: {}
   # Default readiness probe for node service
   readinessProbe:
     httpGet:
@@ -172,6 +173,7 @@ engine:
   # customEnv:
   #   TEST: test
   customEnv:
+  annotations: {}
   # Default readiness probe for rule engine service
   readinessProbe:
     tcpSocket:
