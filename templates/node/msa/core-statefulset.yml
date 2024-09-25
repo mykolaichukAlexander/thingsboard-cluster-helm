@@ -8,7 +8,7 @@ metadata:
   name: {{ include "thingsboard.core.label" . }}
   namespace: {{ $namespace }}
   annotations:
-  {{- .Values.node.annotations | toYaml | nindent 4}}
+  {{- .Values.node.statefulSet.annotations | toYaml | nindent 4}}
   labels:
     app: {{ include "thingsboard.core.label" . }}
 spec:
@@ -19,6 +19,8 @@ spec:
       app: {{ include "thingsboard.core.label" . }}
   template:
     metadata:
+      annotations:
+      {{- .Values.node.annotations | toYaml | nindent 8}}
       labels:
         app: {{ include "thingsboard.core.label" . }}
     spec:
