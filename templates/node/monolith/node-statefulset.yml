@@ -7,6 +7,8 @@ kind: StatefulSet
 metadata:
   name: {{ include "thingsboard.node.label" . }}
   namespace: {{ $namespace }}
+  annotations:
+  {{- .Values.node.annotations | toYaml | nindent 4}}
   labels:
     app: {{ include "thingsboard.node.label" . }}
 spec:
