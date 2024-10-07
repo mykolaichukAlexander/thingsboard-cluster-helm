@@ -1,3 +1,5 @@
+{{- $existingSecret := include "thingsboard.existingSecrets" . | fromYaml | default dict }}
+{{- if not (hasKey $existingSecret "CASSANDRA_PASSWORD") }}
 {{- $namespace := .Release.Namespace -}}
   {{- $releaseName := .Release.Name }}
 {{- if or .Values.externalCassandra.enabled .Values.internalCassandra.enabled }}
@@ -13,4 +15,5 @@ data:
   {{- else}}
   CASSANDRA_PASSWORD: {{ .Values.externalCassandra.password | b64enc }}
   {{- end }}
+{{- end }}
 {{- end }}

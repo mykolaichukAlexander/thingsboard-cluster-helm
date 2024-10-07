@@ -70,6 +70,7 @@ spec:
               value: "monolith"
             - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
               value: "false"
+            {{- include "thingsboard.existingSecrets" . | indent 12 }}
           envFrom:
             - configMapRef:
                 name: {{$releaseName}}-node-custom-env
@@ -78,6 +79,7 @@ spec:
             {{- include "thingboard.cache.configuration.ref" . | indent 12 }}
             {{- include "thingboard.cassandra.configuration.ref" . | indent 12 }}
             {{- include "thingboard.postgres.configuration.ref" . | indent 12 }}
+
           readinessProbe:
             {{- .Values.node.readinessProbe | toYaml | nindent 12 }}
           livenessProbe:

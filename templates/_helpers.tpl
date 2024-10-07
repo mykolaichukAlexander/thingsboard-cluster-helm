@@ -132,7 +132,7 @@ Return a transport image
 {{- printf "%s:%s" $repository $appversion }}
 {{- else }}
 {{- $repository := $transportBody.image.repository | default (printf "thingsboard/tb-%s" $transportBody.name) }}
-{{- $appversion := $transportBody.image.tag | default .Values.global.tag | default (printf "%s" $context.Chart.AppVersion) }}
+{{- $appversion := $transportBody.image.tag | default $context.Values.global.tag | default (printf "%s" $context.Chart.AppVersion) }}
 {{- printf "%s:%s" $repository $appversion }}
 {{- end }}
 {{- end }}
@@ -152,10 +152,75 @@ Return redis configurations environment variables for thingsboard services
 {{- if or (or .Values.internalRedisCluster.enabled .Values.internalRedis.enabled) (or .Values.externalRedis.enabled .Values.installation.msa)}}
 - configMapRef:
     name: {{.Release.Name}}-redis-config
+{{- if not (or .Values.internalRedis.existingSecret .Values.internalRedisCluster.existingSecret .Values.externalRedis.existingSecret) -}}
 - secretRef:
     name: {{.Release.Name}}-redis-secret
 {{- end }}
+{{- end }}
 {{- end}}
+
+
+{{/*
+Get passwords, if they already exist in secrets
+*/}}
+{{- define "thingsboard.existingSecrets" -}}
+{{/*
+Cassandra password
+*/}}
+{{- if and .Values.internalCassandra.enabled .Values.internalCassandra.dbUser.existingSecret -}}
+- name: CASSANDRA_PASSWORD:
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.internalCassandra.dbUser.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.internalCassandra.dbUser.existingSecret "key" "password") }}
+{{- else if and .Values.externalCassandra.enabled .Values.externalCassandra.dbUser.existingSecret -}}
+- name: CASSANDRA_PASSWORD:
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.externalCassandra.dbUser.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.externalCassandra.dbUser.existingSecret "key" "password") }}
+{{- end }}
+{{/*
+Postgresql password
+*/}}
+{{- if and .Values.internalPostgresql.enabled .Values.internalPostgresql.existingSecret -}}
+- name: SPRING_DATASOURCE_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.internalPostgresql.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.internalPostgresql.existingSecret "key" "psql_pass") }}
+{{- else if and .Values.externalPostgresql.enabled .Values.internalPostgresql.existingSecret -}}
+- name: SPRING_DATASOURCE_PASSWORD:
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.externalPostgresql.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.externalPostgresql.existingSecret "key" "psql_pass") }}
+{{- end }}
+{{/*
+Redis password
+*/}}
+{{- if and .Values.internalRedis.enabled .Values.internalRedis.existingSecret -}}
+- name: REDIS_PASSWORD:
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.internalRedis.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.internalRedis.existingSecret "key" "password") }}
+{{- else if and .Values.externalRedis.enabled .Values.externalRedis.existingSecret -}}
+- name: REDIS_PASSWORD:
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.externalRedis.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.externalRedis.existingSecret "key" "password") }}
+{{- else if and .Values.internalRedisCluster.enabled .Values.internalRedisCluster.existingSecret -}}
+- name: REDIS_PASSWORD:
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "common.secrets.name" (dict "existingSecret" .Values.internalRedisCluster.existingSecret "context" $) }}
+      key: {{ include "common.secrets.key" (dict "existingSecret" .Values.internalRedisCluster.existingSecret "key" "password") }}
+{{- end }}
+{{- end }}
+
+
 
 {{/*
 Return redis password
@@ -180,10 +245,14 @@ Return cassandra configurations environment variables for thingsboard services
 {{- if or .Values.internalCassandra.enabled .Values.externalCassandra.enabled }}
 - configMapRef:
     name: {{.Release.Name}}-cassandra-config
+{{- if not (or .Values.internalCassandra.dbUser.existingSecret .Values.externalCassandra.dbUser.existingSecret) -}}
 - secretRef:
     name: {{.Release.Name}}-cassandra-secret
 {{- end }}
+{{- end }}
 {{- end}}
+
+
 
 {{/*
 Return postgresql configurations environment variables for thingsboard services
@@ -191,8 +260,10 @@ Return postgresql configurations environment variables for thingsboard services
 {{- define "thingboard.postgres.configuration.ref"}}
 - configMapRef:
     name: {{.Release.Name}}-postgres-config
+{{- if not (or .Values.internalPostgresql.existingSecret .Values.externalPostgresql.existingSecret) -}}
 - secretRef:
     name: {{.Release.Name}}-postgres-secret
+{{- end }}
 {{- end}}
 
 
