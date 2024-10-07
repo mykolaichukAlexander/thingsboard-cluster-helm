@@ -1,23 +1,14 @@
 {{- $namespace := .Release.Namespace -}}
   {{- $releaseName := .Release.Name }}
-  {{- if not .Values.installation.msa }}
+  {{- if and (not .Values.installation.msa) (empty .Values.node.existingTBLogbackConfigMap) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{$releaseName}}-node-config
+  name: {{printf "%s-node-default-logback-config" $releaseName}}
   namespace: {{ $namespace }}
   labels:
-    name: {{$releaseName}}-node-config
+    name: {{printf "%s-node-default-logback-config" $releaseName}}
 data:
-  conf: |
-      export JAVA_OPTS="$JAVA_OPTS -Dplatform=deb -Dinstall.data_dir=/usr/share/thingsboard/data"
-      export JAVA_OPTS="$JAVA_OPTS -Xlog:gc*,heap*,age*,safepoint=debug:file=/var/log/thingsboard/gc.log:time,uptime,level,tags:filecount=10,filesize=10M"
-      export JAVA_OPTS="$JAVA_OPTS -XX:+IgnoreUnrecognizedVMOptions -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/log/thingsboard/heapdump.bin"
-      export JAVA_OPTS="$JAVA_OPTS -XX:-UseBiasedLocking -XX:+UseTLAB -XX:+ResizeTLAB -XX:+PerfDisableSharedMem -XX:+UseCondCardMark"
-      export JAVA_OPTS="$JAVA_OPTS -XX:+UseG1GC -XX:MaxGCPauseMillis=500 -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled -XX:MaxTenuringThreshold=10"
-      export JAVA_OPTS="$JAVA_OPTS -XX:+ExitOnOutOfMemoryError"
-      export LOG_FILENAME=thingsboard.out
-      export LOADER_PATH=/usr/share/thingsboard/conf,/usr/share/thingsboard/extensions
   logback: |
       <!DOCTYPE configuration>
       <configuration scan="true" scanPeriod="10 seconds">

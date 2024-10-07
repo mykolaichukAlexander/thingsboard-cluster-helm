@@ -85,8 +85,12 @@ spec:
           resources:
             {{- .Values.node.resources | toYaml | nindent 12 }}
           volumeMounts:
-            - name: {{$releaseName}}-core-config
-              mountPath: /config
+            - name: {{ printf "%s-core-config" $releaseName}}
+              mountPath: /config/thingsboard.conf
+              subPath: thingsboard.conf
+            - name: {{ printf "%s-core-logback-config" $releaseName}}
+              mountPath: /config/logback.xml
+              subPath: logback.xml
             - name: {{$releaseName}}-node-logs
               mountPath: /var/log/thingsboard
             - name: {{$releaseName}}-node-data
@@ -94,19 +98,23 @@ spec:
               readOnly: false
       restartPolicy: {{ .Values.node.restartPolicy }}
       volumes:
-        - name: {{ $releaseName }}-core-config
+        - name: {{ printf "%s-core-config" $releaseName }}
           configMap:
-            name: {{ $releaseName }}-core-config
+            name: {{ ternary (printf "%s-core-default-config" $releaseName) .Values.node.existingTBConfigConfigMap (empty .Values.node.existingTBConfigConfigMap) }}
             items:
               - key: conf
                 path: thingsboard.conf
+        - name: {{ printf "%s-core-logback-config" $releaseName}}
+          configMap:
+            name: {{ ternary (printf "%s-core-default-logback-config" $releaseName) .Values.node.existingTBLogbackConfigMap (empty .Values.node.existingTBLogbackConfigMap) }}
+            items:
               - key: logback
                 path: logback.xml
         - name: {{ $releaseName }}-node-logs
-          emptyDir: {}
+          emptyDir: { }
         {{- if not .Values.node.persistence.enabled }}
         - name: {{ printf "%s-node-data" $releaseName}}
-          emptyDir: {}
+          emptyDir: { }
         {{- else if .Values.node.persistence.existingClaim }}
         - name: {{ printf "%s-node-data" $releaseName}}
           persistentVolumeClaim:
