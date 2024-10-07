@@ -84,8 +84,12 @@ spec:
           resources:
             {{- .Values.engine.resources | toYaml | nindent 12 }}
           volumeMounts:
-            - name: {{$releaseName}}-rule-engine-config
-              mountPath: /config
+            - name: {{ printf "%s-rule-engine-config" $releaseName}}
+              mountPath: /config/thingsboard.conf
+              subPath: thingsboard.conf
+            - name: {{ printf "%s-rule-engine-logback-config" $releaseName}}
+              mountPath: /config/logback.xml
+              subPath: logback.xml
             - name: {{$releaseName}}-node-logs
               mountPath: /var/log/thingsboard
             - name: {{$releaseName}}-node-data
@@ -93,12 +97,16 @@ spec:
               readOnly: false
       restartPolicy: {{ .Values.node.restartPolicy }}
       volumes:
-        - name: {{ $releaseName }}-rule-engine-config
+        - name: {{ printf "%s-rule-engine-config" $releaseName}}
           configMap:
-            name: {{ $releaseName }}-rule-engine-config
+            name: {{ ternary (printf "%s-rule-engine-default-config" $releaseName) .Values.engine.existingTBConfigConfigMap  (empty .Values.engine.existingTBConfigConfigMap) }}
             items:
               - key: conf
                 path: thingsboard.conf
+        - name: {{ printf "%s-rule-engine-logback-config" $releaseName}}
+          configMap:
+            name: {{ ternary (printf "%s-rule-engine-default-logback-config" $releaseName) .Values.engine.existingTBLogbackConfigMap  (empty .Values.engine.existingTBLogbackConfigMap) }}
+            items:
               - key: logback
                 path: logback.xml
         - name: {{ $releaseName }}-node-logs

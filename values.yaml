@@ -92,6 +92,10 @@ node:
   # customEnv:
   #   TEST: test
   customEnv: {}
+  # Name of existing Thingsboard config map. Used mostly for JVM options. In config map key conf is expected.
+  existingTBConfigConfigMap: ""
+  # Name of existing Thingsboard Logback config map. Used mostly for JVM options. In config map key logback is expected.
+  existingTBLogbackConfigMap: ""
   annotations: {}
   # Default readiness probe for node service
   readinessProbe:
@@ -176,7 +180,11 @@ engine:
   # Example:
   # customEnv:
   #   TEST: test
-  customEnv:
+  customEnv: {}
+  # Name of existing Thingsboard config map. Used mostly for JVM options. In config map key conf is expected.
+  existingTBConfigConfigMap: ""
+  # Name of existing Thingsboard Logback config map. Used mostly for JVM options. In config map key logback is expected.
+  existingTBLogbackConfigMap: ""
   annotations: {}
   # Default readiness probe for rule engine service
   readinessProbe:
