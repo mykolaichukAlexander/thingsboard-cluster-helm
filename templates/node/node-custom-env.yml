@@ -9,5 +9,5 @@ metadata:
     name: {{$releaseName}}-node-custom-env
 data:
   {{- range $key, $val := .Values.node.customEnv }}
-  {{ $key }}: {{ $val | quote }}
+  {{ $key }}: {{ tpl $val $ | quote }}
   {{- end}}
