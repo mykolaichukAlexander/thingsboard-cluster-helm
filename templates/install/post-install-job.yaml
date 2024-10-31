@@ -1,15 +1,16 @@
 {{- $namespace := .Release.Namespace -}}
   {{- $appVersion := .Chart.AppVersion -}}
   {{- $releaseName := .Release.Name }}
-  {{- if and .Values.installation.installTb (not .Release.IsUpgrade)}}
+  {{- if and .Values.installation.installTb }}
 apiVersion: v1
 kind: Pod
 metadata:
   name: {{$releaseName}}-install-pod
   namespace: {{ $namespace }}
   annotations:
-    "helm.sh/hook": "post-install"
+    "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
+    "helm.sh/hook-timeout": "300s"
   labels:
     app: install-job
 spec:
