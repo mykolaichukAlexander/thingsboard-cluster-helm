@@ -40,3 +40,4 @@ rebuild-docker.sh
 instance-license.data
 Writerside/
 charts/
+test_values.yaml
