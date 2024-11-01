@@ -8,9 +8,14 @@ metadata:
   name: {{$releaseName}}-install-pod
   namespace: {{ $namespace }}
   annotations:
+    {{- if .Values.installation.argocd }}
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    {{- else}}
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
     "helm.sh/hook-timeout": "300s"
+    {{- end}}
   labels:
     app: install-job
 spec:

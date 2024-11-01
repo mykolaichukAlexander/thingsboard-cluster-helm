@@ -32,6 +32,8 @@ installation:
   # Thingsboard can run in different configurations to meet different needs. To decide in what configuration you should
   # run your cluster please visit https://thingsboard.io/docs/pe/reference/#monolithic-vs-microservices-architecture.
   msa: true
+  # When this chart installing via ArgoCd
+  argocd: false
 
 # Credentials that will use for getting images. By default, all images in this chart are open. But in case of using custom
 # code images, this auth will be used.
