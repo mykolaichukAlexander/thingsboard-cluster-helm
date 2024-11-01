@@ -14,10 +14,10 @@ annotations:
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
     - kind: added
-      description: Add possibility to use install hook with helm upgrade command
+      description: Add support for ArgoCD hooks
       links:
         - name: GitHub PR
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/27
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/29
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
