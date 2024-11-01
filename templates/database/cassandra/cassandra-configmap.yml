@@ -17,9 +17,11 @@ data:
   CASSANDRA_URL: {{ printf "%s-%s:9042" .Release.Name .Values.internalCassandra.nameOverride }}
   CASSANDRA_LOCAL_DATACENTER: {{ .Values.internalCassandra.cluster.datacenter  }}
   CASSANDRA_USERNAME: {{ .Values.internalCassandra.dbUser.user }}
+  CASSANDRA_KEYSPACE_NAME: {{ .Values.internalCassandra.keyspace }}
   {{- else}}
   CASSANDRA_URL: {{ printf "%s:%s" .Values.externalCassandra.host .Values.externalCassandra.port }}
   CASSANDRA_LOCAL_DATACENTER: {{ .Values.externalCassandra.datacenter }}
   CASSANDRA_USERNAME: {{ .Values.externalCassandra.user  }}
+  CASSANDRA_KEYSPACE_NAME: {{ .Values.externalCassandra.keyspace }}
   {{- end }}
 {{- end }}

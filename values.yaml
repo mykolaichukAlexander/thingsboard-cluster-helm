@@ -656,6 +656,7 @@ externalCassandra:
   password: cassandra
   # External cassandra datacenter
   datacenter: "dc1"
+  keyspace: "thingsboard"
 
 # Option if you want to use internal Cassandra that will be up and run by this chart. This section will bring
 # bitnami/cassandra (https://artifacthub.io/packages/helm/bitnami/cassandra) into this chart. If you want to add some extra
@@ -668,6 +669,7 @@ internalCassandra:
   enabled: false
   # Default Replication Strategy for Keyspace that will be created
   replicationStrategy: SimpleStrategy
+  keyspace: "thingsboard"
   # Default Replication count
   replicaCount: 1
   # Default cluster configuration
