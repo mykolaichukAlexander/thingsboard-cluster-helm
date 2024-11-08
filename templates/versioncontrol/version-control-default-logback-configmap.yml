@@ -1,0 +1,29 @@
+{{- $namespace := .Release.Namespace -}}
+  {{- $releaseName := .Release.Name }}
+  {{- if and (.Values.installation.msa) (empty .Values.node.existingTBLogbackConfigMap) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-version-control-default-logback-config" $releaseName}}
+  namespace: {{ $namespace }}
+  labels:
+    name: {{ printf "%s-version-control-default-logback-config" $releaseName}}
+data:
+  logback: |
+    <!DOCTYPE configuration>
+    <configuration scan="true" scanPeriod="10 seconds">
+
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{ISO8601} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <logger name="org.apache.kafka.common.utils.AppInfoParser" level="WARN"/>
+        <logger name="org.apache.kafka.clients" level="WARN"/>
+
+        <root level="DEBUG">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </configuration>
+  {{- end }}
