@@ -52,6 +52,21 @@ Return a node image
 {{- end }}
 
 {{/*
+Return a node image
+*/}}
+{{- define "thingsboard.versioncontrol.image" -}}
+{{- if .Values.installation.pe }}
+{{- $repository := .Values.versionControl.image.repository | default .Values.global.repository | default "thingsboard/tb-pe-vc-executor" }}
+{{- $appversion := .Values.versionControl.image.tag | default (printf "%sPE" .Values.global.tag) | default (printf "%sPE" .Chart.AppVersion) }}
+{{- printf "%s:%s" $repository $appversion }}
+{{- else }}
+{{- $repository := .Values.engine.image.repository | default .Values.global.repository | default "thingsboard/tb-vc-executor" }}
+{{- $appversion := .Values.engine.image.tag | default .Values.global.tag | default (printf "%s" .Chart.AppVersion) }}
+{{- printf "%s:%s" $repository $appversion }}
+{{- end }}
+{{- end }}
+
+{{/*
 Returning a port list for Tb node pod. If Transport is enabled but this is not MSA mode its ports will be added to Node.
 */}}
 {{- define "thingsboard.node.ports" }}
@@ -119,6 +134,10 @@ Return a rule engine label
         cpu: "1000m"
         memory: 3000Mi
 {{- end}}
+
+{{- define "thingsboard.versioncontrol.label" -}}
+{{ printf "%s-version-control" .Release.Name }}
+{{- end }}
 
 {{/*
 Return a transport image
