@@ -443,7 +443,98 @@ versionControl:
       cpu: "500m"
       memory: 1000Mi
 
+integrationExecutor:
+  # Enable of disable ie service in cluster.
+  enabled: false
+  image:
+    # Repository that will be used for ie service. If blank - default repository will be used
+    repository:
+    # Tag that will be used for ie service. If blank - default tag will be used
+    tag:
 
+  imagePullPolicy: Always
+
+  statefulSet:
+    # Replica count for ie services
+    replicas: 1
+
+    annotations: { }
+  # List of ports for ie service, you can just add your custom ports as list entries and their will be rendered
+  # and added to node manifest
+  ports:
+    - value: 8080
+      name: http
+    - value: 9090
+      name: rpc
+  # Node selector for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Usually it is Map type. Example:
+  # nodeSelector:
+  #    disktype: ssd
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  nodeSelector: { }
+  # Affinity for choosing nodes for scheduling pods.
+  # Note that this is default kubernetes object, so you need to specify whole object, not just labels.
+  # Example:
+  # affinity:
+  #    nodeAffinity:
+  #      requiredDuringSchedulingIgnoredDuringExecution:
+  #        nodeSelectorTerms:
+  #        - matchExpressions:
+  #          - key: topology.kubernetes.io/zone
+  #            operator: In
+  #            values:
+  #            - antarctica-east1
+  #            - antarctica-west1
+  # See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for more details
+  affinity: { }
+  # A Map for custom environment variable for version control service. If not empty, all env vars will be added on config map
+  # and will path to pods. Useful while custom developing.
+  # Example:
+  # customEnv:
+  #   TEST: test
+  customEnv: { }
+  # Name of existing Thingsboard config map. Used mostly for JVM options. In config map key conf is expected.
+  existingTBConfigConfigMap: ""
+  # Name of existing Thingsboard Logback config map. Used mostly for JVM options. In config map key logback is expected.
+  existingTBLogbackConfigMap: ""
+  annotations: { }
+  # Default readiness probe for version control service
+  readinessProbe:
+    tcpSocket:
+      port: 8080
+    initialDelaySeconds: 50
+    periodSeconds: 10
+    timeoutSeconds: 10
+    successThreshold: 1
+    failureThreshold: 5
+  # Default liveness probe for version control service
+  livenessProbe:
+    tcpSocket:
+      port: 8080
+    initialDelaySeconds: 300
+    timeoutSeconds: 10
+  restartPolicy: Always
+  securityContext:
+    runAsUser: 799
+    runAsNonRoot: true
+    fsGroup: 799
+  persistence:
+    enabled: true
+    existingClaim: ""
+    size: 1Gi
+    accessModes: [ "ReadWriteOnce" ]
+    storageClass:
+  # Default resources for rule-engine pods.
+  resources:
+    # Default limits for CPU and Memory that pods after which pods will be evicted/killed
+    limits:
+      cpu: "1000m"
+      memory: 2000Mi
+    # Default requests for CPU and Memory that pods will try to use
+    requests:
+      cpu: "500m"
+      memory: 1000Mi
 
 # Transport configuration. (more on https://thingsboard.io/docs/reference/msa/)
 # Thingsboard has various options for different protocols that can help you connect devices with

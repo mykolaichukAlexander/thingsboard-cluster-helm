@@ -124,7 +124,7 @@ spec:
         accessModes: {{ .Values.versionControl.persistence.accessModes }}
         resources:
           requests:
-            storage: {{ .Values.engine.persistence.size }}
+            storage: {{ .Values.integrationExecutor.persistence.size }}
         storageClassName: {{ ternary "" .Values.versionControl.persistence.storageClass (empty .Values.versionControl.persistence.storageClass) }}
         {{- end }}
 {{- end}}

@@ -52,7 +52,7 @@ Return a node image
 {{- end }}
 
 {{/*
-Return a node image
+Return a vc image
 */}}
 {{- define "thingsboard.versioncontrol.image" -}}
 {{- if .Values.installation.pe }}
@@ -64,6 +64,15 @@ Return a node image
 {{- $appversion := .Values.engine.image.tag | default .Values.global.tag | default (printf "%s" .Chart.AppVersion) }}
 {{- printf "%s:%s" $repository $appversion }}
 {{- end }}
+{{- end }}
+
+{{/*
+Return a ie image
+*/}}
+{{- define "thingsboard.integrationexecutor.image" -}}
+{{- $repository := .Values.integrationExecutor.image.repository | default .Values.global.repository | default "thingsboard/tb-pe-integration-executor" }}
+{{- $appversion := .Values.integrationExecutor.image.tag | default (printf "%sPE" .Values.global.tag) | default (printf "%sPE" .Chart.AppVersion) }}
+{{- printf "%s:%s" $repository $appversion }}
 {{- end }}
 
 {{/*
@@ -137,6 +146,10 @@ Return a rule engine label
 
 {{- define "thingsboard.versioncontrol.label" -}}
 {{ printf "%s-version-control" .Release.Name }}
+{{- end }}
+
+{{- define "thingsboard.integrationexecutor.label" -}}
+{{ printf "%s-integration-executor" .Release.Name }}
 {{- end }}
 
 {{/*
