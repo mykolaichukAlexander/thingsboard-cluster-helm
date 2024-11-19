@@ -1,13 +1,13 @@
 {{- $namespace := .Release.Namespace -}}
   {{- $releaseName := .Release.Name }}
-  {{- if and (.Values.installation.msa) (empty .Values.versionControl.existingTBLogbackConfigMap) }}
+  {{- if and (.Values.installation.msa) (empty .Values.integrationExecutor.existingTBLogbackConfigMap) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ printf "%s-version-control-default-logback-config" $releaseName}}
+  name: {{ printf "%s-integration-executor-default-logback-config" $releaseName}}
   namespace: {{ $namespace }}
   labels:
-    name: {{ printf "%s-version-control-default-logback-config" $releaseName}}
+    name: {{ printf "%s-integration-executor-default-logback-config" $releaseName}}
 data:
   logback: |
     <!DOCTYPE configuration>
@@ -22,7 +22,7 @@ data:
         <logger name="org.apache.kafka.common.utils.AppInfoParser" level="WARN"/>
         <logger name="org.apache.kafka.clients" level="WARN"/>
 
-        <root level="DEBUG">
+        <root level="INFO">
             <appender-ref ref="STDOUT"/>
         </root>
     </configuration>

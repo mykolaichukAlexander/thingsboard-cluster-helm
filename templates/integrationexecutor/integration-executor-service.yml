@@ -1,0 +1,20 @@
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $releaseName := .Release.Name }}
+{{- if and (and .Values.installation.msa .Values.integrationExecutor.enabled) .Values.installation.pe }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "thingsboard.integrationexecutor.label" .}}
+  namespace: {{ $namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "thingsboard.integrationexecutor.label" .}}
+  ports:
+    {{- range .Values.integrationExecutor.ports }}
+    - port: {{ .value }}
+      name: {{ .name }}
+      protocol: {{ .protocol | default "TCP" | toString }}
+      {{- end}}
+{{- end}}

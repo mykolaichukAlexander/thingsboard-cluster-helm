@@ -1,0 +1,126 @@
+{{- $appVersion := .Chart.AppVersion -}}
+{{- $namespace := .Release.Namespace -}}
+{{- $releaseName := .Release.Name }}
+{{- if and (and .Values.installation.msa .Values.integrationExecutor.enabled) .Values.installation.pe }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "thingsboard.integrationexecutor.label" . }}
+  namespace: {{ $namespace }}
+  annotations:
+  {{- .Values.versionControl.statefulSet.annotations | toYaml | nindent 4}}
+  labels:
+    app: {{ include "thingsboard.integrationexecutor.label" . }}
+spec:
+  serviceName: {{ include "thingsboard.integrationexecutor.label" . }}
+  replicas: {{ .Values.integrationExecutor.statefulSet.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "thingsboard.integrationexecutor.label" . }}
+  template:
+    metadata:
+      annotations:
+      {{- .Values.integrationExecutor.annotations | toYaml | nindent 8}}
+      labels:
+        app: {{ include "thingsboard.integrationexecutor.label" . }}
+    spec:
+      nodeSelector:
+        {{- .Values.integrationExecutor.nodeSelector | toYaml | nindent 8 }}
+      affinity:
+        {{- .Values.integrationExecutor.affinity | toYaml | nindent 8 }}
+      securityContext:
+        {{- .Values.integrationExecutor.securityContext | toYaml | nindent 8 }}
+      imagePullSecrets:
+        - name: {{ .Values.global.imagePullSecret }}
+      containers:
+        - name: server
+          imagePullPolicy: {{ .Values.integrationExecutor.imagePullPolicy }}
+          image: {{ include "thingsboard.integrationexecutor.image" . }}
+          ports:
+            {{- range .Values.integrationExecutor.ports }}
+            - containerPort: {{ .value }}
+              name: {{ .name }}
+              protocol: {{ .protocol | default "TCP" | toString }}
+            {{- end}}
+          env:
+            - name: RPC_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: TB_SERVICE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: TB_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: TB_SERVICE_TYPE
+              value: "tb-integration-executor"
+            - name: HTTP_BIND_ADDRESS
+              value: "0.0.0.0"
+            - name: HTTP_BIND_PORT
+              value: "8080"
+            {{- range $envKey, $envValue := .Values.integrationExecutor.customEnv }}
+            - name: {{ $envKey }}
+              value: {{ $envValue | quote }}
+            {{- end }}
+          envFrom:
+            {{- include "thingboard.coordinator.configuration.ref" . | indent 12 }}
+            {{- include "thingboard.queue.configuration.ref" . | indent 12 }}
+            {{- include "thingboard.cache.configuration.ref" . | indent 12 }}
+            {{- include "thingboard.cassandra.configuration.ref" . | indent 12 }}
+            {{- include "thingboard.postgres.configuration.ref" . | indent 12 }}
+          readinessProbe:
+            {{- .Values.integrationExecutor.readinessProbe | toYaml | nindent 12 }}
+          livenessProbe:
+            {{- .Values.integrationExecutor.livenessProbe | toYaml | nindent 12 }}
+          resources:
+            {{- .Values.integrationExecutor.resources | toYaml | nindent 12 }}
+          volumeMounts:
+            - name: {{ printf "%s-integration-executor-config" $releaseName}}
+              mountPath: /config/tb-ie-executor.conf
+              subPath: tb-ie-executor.conf
+            - name: {{ printf "%s-integration-executor-logback-config" $releaseName}}
+              mountPath: /config/logback.xml
+              subPath: logback.xml
+            - name: {{$releaseName}}-integration-executor-logs
+              mountPath: /var/log/tb-integration-executor/log
+            - name: {{$releaseName}}-integration-executor-data
+              mountPath: /data
+              readOnly: false
+      restartPolicy: {{ .Values.node.restartPolicy }}
+      volumes:
+        - name: {{ printf "%s-integration-executor-config" $releaseName}}
+          configMap:
+            name: {{ ternary (printf "%s-integration-executor-default-config" $releaseName) .Values.integrationExecutor.existingTBConfigConfigMap  (empty .Values.integrationExecutor.existingTBConfigConfigMap) }}
+            items:
+              - key: conf
+                path: tb-vc-executor.conf
+        - name: {{ printf "%s-integration-executor-logback-config" $releaseName}}
+          configMap:
+            name: {{ ternary (printf "%s-integration-executor-default-logback-config" $releaseName) .Values.integrationExecutor.existingTBLogbackConfigMap  (empty .Values.integrationExecutor.existingTBLogbackConfigMap) }}
+            items:
+              - key: logback
+                path: logback.xml
+        - name: {{ $releaseName }}-integration-executor-logs
+          emptyDir: {}
+        {{- if not .Values.integrationExecutor.persistence.enabled }}
+        - name: {{ printf "%s-integration-executor-data" $releaseName}}
+          emptyDir: {}
+        {{- else if .Values.integrationExecutor.persistence.existingClaim }}
+        - name: {{ printf "%s-integration-executor-data" $releaseName}}
+          persistentVolumeClaim:
+            claimName: {{ .Values.integrationExecutor.persistence.existingClaim }}
+        {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: {{ printf "%s-integration-executor-data" $releaseName}}
+      spec:
+        accessModes: {{ .Values.integrationExecutor.persistence.accessModes }}
+        resources:
+          requests:
+            storage: {{ .Values.integrationExecutor.persistence.size }}
+        storageClassName: {{ ternary "" .Values.integrationExecutor.persistence.storageClass (empty .Values.integrationExecutor.persistence.storageClass) }}
+        {{- end }}
+{{- end}}
