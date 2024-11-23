@@ -48,6 +48,8 @@ spec:
         - name: LOAD_DEMO
           value: "true"
         {{- end }}
+      env:
+        {{- include "thingsboard.existingSecrets" . | indent 12 }}
       envFrom:
         {{- include "thingboard.cassandra.configuration.ref" . | indent 12 }}
         {{- include "thingboard.postgres.configuration.ref" . | indent 12 }}
