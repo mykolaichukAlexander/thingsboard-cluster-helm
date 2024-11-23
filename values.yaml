@@ -669,7 +669,7 @@ transports:
     # Name that will be used for kubernetes resources like sts and services
     name: mqtt-transport
     # Enable or disable this transport into your cluster
-    enabled: true
+    enabled: false
     image:
       # Transport custom repository. When blank - default repository will be used
       repository:
