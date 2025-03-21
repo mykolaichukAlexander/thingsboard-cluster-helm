@@ -18,7 +18,7 @@ spec:
         app: {{$releaseName}}-web-ui
     spec:
       imagePullSecrets:
-        - name: {{ .Values.global.imagePullSecret }}
+        - name: {{ or .Values.web.imagePullSecret .Values.global.imagePullSecret }}
       affinity:
         {{- .Values.web.affinity | toYaml | nindent 8 }}
       containers:
