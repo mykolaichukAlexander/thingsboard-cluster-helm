@@ -2,6 +2,7 @@
   {{- $releaseName := .Release.Name }}
 {{- range $key, $transport := .Values.transports }}
 {{- if and $transport.enabled $.Values.installation.msa }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:

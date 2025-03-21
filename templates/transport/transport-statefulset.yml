@@ -4,6 +4,7 @@
   {{- $releaseName := .Release.Name }}
 {{- range $kay, $transport := .Values.transports }}
 {{- if and $transport.enabled $.Values.installation.msa }}
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
