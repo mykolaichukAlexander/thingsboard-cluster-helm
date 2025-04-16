@@ -3,7 +3,7 @@ appVersion: 3.6.0
 description: Helm chart for Thingsboard cluster.
 name: thingsboard-cluster
 type: application
-version: 0.2.11
+version: 0.2.12
 annotations:
   artifacthub.io/category: streaming-messaging
   licenses: Apache-2.0

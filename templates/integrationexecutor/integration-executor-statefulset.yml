@@ -81,7 +81,7 @@ spec:
             - name: {{ printf "%s-integration-executor-config" $releaseName}}
               mountPath: /config/tb-ie-executor.conf
               subPath: tb-ie-executor.conf
-            - name: {{ printf "%s-integration-executor-logback-config" $releaseName}}
+            - name: {{ printf "%s-ie-default-logback-config" $releaseName}}
               mountPath: /config/logback.xml
               subPath: logback.xml
             - name: {{$releaseName}}-integration-executor-logs
@@ -97,9 +97,9 @@ spec:
             items:
               - key: conf
                 path: tb-vc-executor.conf
-        - name: {{ printf "%s-integration-executor-logback-config" $releaseName}}
+        - name: {{ printf "%s-ie-default-logback-config" $releaseName}}
           configMap:
-            name: {{ ternary (printf "%s-integration-executor-default-logback-config" $releaseName) .Values.integrationExecutor.existingTBLogbackConfigMap  (empty .Values.integrationExecutor.existingTBLogbackConfigMap) }}
+            name: {{ ternary (printf "%s-ie-default-logback-config" $releaseName) .Values.integrationExecutor.existingTBLogbackConfigMap  (empty .Values.integrationExecutor.existingTBLogbackConfigMap) }}
             items:
               - key: logback
                 path: logback.xml

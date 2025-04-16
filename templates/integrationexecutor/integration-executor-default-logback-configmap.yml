@@ -1,13 +1,14 @@
 {{- $namespace := .Release.Namespace -}}
   {{- $releaseName := .Release.Name }}
+{{- if .Values.integrationExecutor.enabled }}
   {{- if and (.Values.installation.msa) (empty .Values.integrationExecutor.existingTBLogbackConfigMap) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ printf "%s-integration-executor-default-logback-config" $releaseName}}
+  name: {{ printf "%s-ie-default-logback-config" $releaseName}}
   namespace: {{ $namespace }}
   labels:
-    name: {{ printf "%s-integration-executor-default-logback-config" $releaseName}}
+    name: {{ printf "%s-ie-default-logback-config" $releaseName}}
 data:
   logback: |
     <!DOCTYPE configuration>
@@ -27,3 +28,4 @@ data:
         </root>
     </configuration>
   {{- end }}
+    {{- end }}
