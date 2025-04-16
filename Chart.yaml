@@ -3,7 +3,7 @@ appVersion: 3.6.0
 description: Helm chart for Thingsboard cluster.
 name: thingsboard-cluster
 type: application
-version: 0.2.13
+version: 0.2.14
 annotations:
   artifacthub.io/category: streaming-messaging
   licenses: Apache-2.0
@@ -14,10 +14,14 @@ annotations:
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
     - kind: fixed
-      description: Rule engine custom env variable bug fix 
+      description: Fix external postgres connection issue and transport service issue
       links:
         - name: GitHub PR
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/44
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/46
+        - name: GitHub Issue
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/7
+        - name: GitHub Issue
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/issues/5
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
