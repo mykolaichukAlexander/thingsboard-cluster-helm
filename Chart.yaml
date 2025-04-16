@@ -18,9 +18,9 @@ annotations:
       links:
         - name: GitHub PR
           url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/40
-        - name: GitHub Issue
+        - name: GitHub PR
           url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/39
-        - name: GitHub Issue
+        - name: GitHub PR
           url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/41
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
