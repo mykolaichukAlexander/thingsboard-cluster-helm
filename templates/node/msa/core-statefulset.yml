@@ -70,9 +70,11 @@ spec:
               value: "tb-core"
             - name: HTTP_LOG_CONTROLLER_ERROR_STACK_TRACE
               value: "false"
+            {{- range $key, $val := .Values.node.customEnv }}
+            - name: {{ $key }}
+              value: {{ tpl $val $ | quote }}
+            {{- end}}
           envFrom:
-            - configMapRef:
-                name: {{$releaseName}}-node-custom-env
             {{- include "thingboard.coordinator.configuration.ref" . | indent 12 }}
             {{- include "thingboard.queue.configuration.ref" . | indent 12 }}
             {{- include "thingboard.cache.configuration.ref" . | indent 12 }}
