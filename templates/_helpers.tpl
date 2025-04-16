@@ -346,7 +346,7 @@ Init container that will slow deployment and let Service deploy after all script
           key: SPRING_DATASOURCE_PASSWORD
   {{- if or $context.Values.internalCassandra.enabled $context.Values.externalCassandra.enabled }}
     - name: CASSANDRA_HOST
-      value: {{ ternary (printf "%s-%s" $context.Release.Name $context.Values.internalCassandra.nameOverride ) ( printf "%s:%s" $context.Values.externalCassandra.host $context.Values.externalCassandra.port) $context.Values.internalCassandra.enabled }}
+      value: {{ ternary (printf "%s-%s" $context.Release.Name $context.Values.internalCassandra.nameOverride ) ( printf "%s" $context.Values.externalCassandra.host) $context.Values.internalCassandra.enabled }}
     - name: CASSANDRA_USER
       value: {{ ternary $context.Values.internalCassandra.dbUser.user $context.Values.externalCassandra.user $context.Values.internalCassandra.enabled }}
     - name: CASSANDRA_PASSWORD
