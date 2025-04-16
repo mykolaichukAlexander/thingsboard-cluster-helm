@@ -14,12 +14,10 @@ annotations:
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
     - kind: fixed
-      description: Fixed transport image render issue
+      description: Fix kubernetes error on long name for configmaps, fix aws ingress routes 
       links:
         - name: GitHub PR
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/18
-        - name: GitHub PR
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/37
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/42
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
