@@ -97,6 +97,22 @@ spec:
             - name: {{$releaseName}}-node-data
               mountPath: /data
               readOnly: false
+            {{- if not ( empty .Values.engine.extraConfigMapsVolumes ) }}
+                            {{- range .Values.engine.extraConfigMapsVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: {{ .readOnly | default false}}
+              subPath: {{ .subPath | default ""}}
+                            {{- end }}
+                    {{- end }}
+            {{- if not ( empty .Values.engine.extraSecretsVolumes ) }}
+                            {{- range .Values.engine.extraSecretsVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: {{ .readOnly | default false}}
+              subPath: {{ .subPath | default ""}}
+                            {{- end }}
+            {{- end }}
       restartPolicy: {{ .Values.node.restartPolicy }}
       volumes:
         - name: {{ printf "%s-rule-engine-config" $releaseName}}
@@ -113,6 +129,34 @@ spec:
                 path: logback.xml
         - name: {{ $releaseName }}-node-logs
           emptyDir: {}
+        {{- if not ( empty .Values.engine.extraConfigMapsVolumes) }}
+                    {{- range .Values.engine.extraConfigMapsVolumes }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .name }}
+                        {{- if .items }}
+            items:
+                        {{- range .items }}
+              - key: {{ .key }}
+                path: {{ .path }}
+                        {{- end}}
+                        {{- end }}
+                    {{- end }}
+                {{- end }}
+        {{- if not ( empty .Values.engine.extraSecretsVolumes) }}
+                  {{- range .Values.engine.extraSecretsVolumes }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .name }}
+                      {{- if .items }}
+            items:
+                      {{- range .items }}
+              - key: {{ .key }}
+                path: {{ .path }}
+                      {{- end}}
+                      {{- end }}
+                    {{- end }}
+        {{- end }}
         {{- if not .Values.engine.persistence.enabled }}
         - name: {{ printf "%s-node-data" $releaseName}}
           emptyDir: {}

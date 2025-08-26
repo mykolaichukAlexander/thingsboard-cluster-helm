@@ -24,3 +24,7 @@
 custom-values/
 chart
 test_values.yaml
+test-config.txt
+test-secret.txt
+test-values.yaml
+CLAUDE.md

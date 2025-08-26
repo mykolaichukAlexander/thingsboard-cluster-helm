@@ -134,6 +134,30 @@ node:
     requests:
       cpu: "1000m"
       memory: 3000Mi
+  # Additional ConfigMap volumes to mount into the node/core container
+  # Useful for mounting custom configuration files, certificates, or other data
+  # Example:
+  # extraConfigMapsVolumes:
+  #   - name: my-configmap              # Name of existing ConfigMap
+  #     mountPath: /path/to/mount       # Path where to mount in container
+  #     readOnly: true                  # Optional: mount as read-only (default: false)
+  #     subPath: myfile.conf            # Optional: mount specific file only
+  #     items:                          # Optional: specify which keys to mount
+  #       - key: config-key             # Key from ConfigMap
+  #         path: custom-name.conf      # Custom filename in mount path
+  extraConfigMapsVolumes: []
+  # Additional Secret volumes to mount into the node/core container
+  # Useful for mounting sensitive data like certificates, API keys, or credentials
+  # Example:
+  # extraSecretsVolumes:
+  #   - name: my-secret               # Name of existing Secret
+  #     mountPath: /path/to/secrets   # Path where to mount in container
+  #     readOnly: true                # Optional: mount as read-only (default: false)
+  #     subPath: cert.pem             # Optional: mount specific file only
+  #     items:                        # Optional: specify which keys to mount
+  #       - key: tls-cert             # Key from Secret
+  #         path: server.crt          # Custom filename in mount path
+  extraSecretsVolumes: []
 
 ## This node category will use to configur Thingsboard rule engine in MSA mode.
 engine:
@@ -226,6 +250,30 @@ engine:
     requests:
       cpu: "1000m"
       memory: 3000Mi
+  # Additional ConfigMap volumes to mount into the rule-engine container
+  # Useful for mounting custom configuration files, certificates, or other data
+  # Example:
+  # extraConfigMapsVolumes:
+  #   - name: my-configmap              # Name of existing ConfigMap
+  #     mountPath: /path/to/mount       # Path where to mount in container
+  #     readOnly: true                  # Optional: mount as read-only (default: false)
+  #     subPath: myfile.conf            # Optional: mount specific file only
+  #     items:                          # Optional: specify which keys to mount
+  #       - key: config-key             # Key from ConfigMap
+  #         path: custom-name.conf      # Custom filename in mount path
+  extraConfigMapsVolumes: [ ]
+  # Additional Secret volumes to mount into the rule-engine container
+  # Useful for mounting sensitive data like certificates, API keys, or credentials
+  # Example:
+  # extraSecretsVolumes:
+  #   - name: my-secret               # Name of existing Secret
+  #     mountPath: /path/to/secrets   # Path where to mount in container
+  #     readOnly: true                # Optional: mount as read-only (default: false)
+  #     subPath: cert.pem             # Optional: mount specific file only
+  #     items:                        # Optional: specify which keys to mount
+  #       - key: tls-cert             # Key from Secret
+  #         path: server.crt          # Custom filename in mount path
+  extraSecretsVolumes: [ ]
 
 
 # Thingsboard Web Report Service configuration section

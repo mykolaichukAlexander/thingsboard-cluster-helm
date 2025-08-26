@@ -41,3 +41,7 @@ instance-license.data
 Writerside/
 charts/
 test_values.yaml
+/test-values.yaml
+/test-config.txt
+/test-secret.txt
+/CLAUDE.md
