@@ -15,6 +15,9 @@ annotations:
   artifacthub.io/changes: |
     - kind: fixed
       description: Fix install issues
+      links:
+            - name: GitHub PR
+              url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/50
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
