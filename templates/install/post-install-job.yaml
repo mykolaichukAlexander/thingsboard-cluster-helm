@@ -44,6 +44,8 @@ spec:
               fieldPath: metadata.name
         - name: INSTALL_TB
           value: "true"
+        - name: CACHE_TYPE
+          value: caffeine
         {{- if .Values.installation.loadDemo}}
         - name: LOAD_DEMO
           value: "true"
