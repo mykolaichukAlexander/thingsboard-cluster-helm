@@ -14,7 +14,7 @@ annotations:
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
     - kind: fixed
-      description: Fix install issues
+      description: Add support for existing configmaps and secrets
       links:
             - name: GitHub PR
               url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/50
