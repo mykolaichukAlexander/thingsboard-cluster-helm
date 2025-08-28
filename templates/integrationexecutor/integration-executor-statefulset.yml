@@ -8,7 +8,7 @@ metadata:
   name: {{ include "thingsboard.integrationexecutor.label" . }}
   namespace: {{ $namespace }}
   annotations:
-  {{- .Values.versionControl.statefulSet.annotations | toYaml | nindent 4}}
+  {{- .Values.integrationExecutor.statefulSet.annotations | toYaml | nindent 4}}
   labels:
     app: {{ include "thingsboard.integrationexecutor.label" . }}
 spec:
@@ -96,7 +96,7 @@ spec:
             name: {{ ternary (printf "%s-integration-executor-default-config" $releaseName) .Values.integrationExecutor.existingTBConfigConfigMap  (empty .Values.integrationExecutor.existingTBConfigConfigMap) }}
             items:
               - key: conf
-                path: tb-vc-executor.conf
+                path: tb-ie-executor.conf
         - name: {{ printf "%s-ie-default-logback-config" $releaseName}}
           configMap:
             name: {{ ternary (printf "%s-ie-default-logback-config" $releaseName) .Values.integrationExecutor.existingTBLogbackConfigMap  (empty .Values.integrationExecutor.existingTBLogbackConfigMap) }}
