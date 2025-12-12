@@ -968,7 +968,18 @@ azure:
       hosts:
         - www.example.com
 
-# This ingress doesn't have any of special configuration and can apply for test or fast installation
-# Full responsibility on Kubernetes service provider
+
 defaultIngress:
   enabled: false
+  labels: {}
+  # name: http-ingress
+  # ingressClassName: nginx
+  # annotations: {}
+  #   kubernetes.io/ingress.class: nginx
+  #   cert-manager.io/cluster-issuer: letsencrypt-prod
+  # hosts:
+  #   - host: thingsboard.example.com
+  # tls:
+  #   - secretName: thingsboard-tls
+  #     hosts:
+  #       - thingsboard.example.com
