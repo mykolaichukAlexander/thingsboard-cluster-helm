@@ -3,7 +3,7 @@ appVersion: 3.6.0
 description: Helm chart for Thingsboard cluster.
 name: thingsboard-cluster
 type: application
-version: 0.2.19
+version: 0.2.2
 annotations:
   artifacthub.io/category: streaming-messaging
   licenses: Apache-2.0
@@ -14,10 +14,10 @@ annotations:
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
     - kind: changed
-      description: Changed bitnami images repo to bitnamilegacy repo to prevent image pull errors. 
+      description: Change default ingress configuration to be more flexible
       links:
         - name: GitHub PR
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/54
+          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/56
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
