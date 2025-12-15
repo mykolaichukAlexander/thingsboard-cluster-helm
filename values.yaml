@@ -158,6 +158,34 @@ node:
   #       - key: tls-cert             # Key from Secret
   #         path: server.crt          # Custom filename in mount path
   extraSecretsVolumes: []
+  # Additional arbitrary volumes to mount into the node/core container
+  # Useful for mounting existing PersistentVolumeClaims (EFS, NFS, etc.) or other volume types
+  # Example:
+  # extraVolumes:
+  #   - name: efs-volume
+  #     persistentVolumeClaim:
+  #       claimName: my-efs-pvc
+  #   - name: nfs-volume
+  #     nfs:
+  #       server: nfs-server.example.com
+  #       path: /exports/data
+  #   - name: host-path-volume
+  #     hostPath:
+  #       path: /data/thingsboard
+  #       type: DirectoryOrCreate
+  extraVolumes: []
+  # Additional arbitrary volume mounts for the node/core container
+  # Use this together with extraVolumes to mount the volumes defined above
+  # Example:
+  # extraVolumeMounts:
+  #   - name: efs-volume
+  #     mountPath: /mnt/efs
+  #     readOnly: false
+  #   - name: nfs-volume
+  #     mountPath: /mnt/nfs
+  #   - name: host-path-volume
+  #     mountPath: /mnt/host-data
+  extraVolumeMounts: []
 
 ## This node category will use to configur Thingsboard rule engine in MSA mode.
 engine:
@@ -274,6 +302,34 @@ engine:
   #       - key: tls-cert             # Key from Secret
   #         path: server.crt          # Custom filename in mount path
   extraSecretsVolumes: [ ]
+  # Additional arbitrary volumes to mount into the rule-engine container
+  # Useful for mounting existing PersistentVolumeClaims (EFS, NFS, etc.) or other volume types
+  # Example:
+  # extraVolumes:
+  #   - name: efs-volume
+  #     persistentVolumeClaim:
+  #       claimName: my-efs-pvc
+  #   - name: nfs-volume
+  #     nfs:
+  #       server: nfs-server.example.com
+  #       path: /exports/data
+  #   - name: host-path-volume
+  #     hostPath:
+  #       path: /data/thingsboard
+  #       type: DirectoryOrCreate
+  extraVolumes: []
+  # Additional arbitrary volume mounts for the rule-engine container
+  # Use this together with extraVolumes to mount the volumes defined above
+  # Example:
+  # extraVolumeMounts:
+  #   - name: efs-volume
+  #     mountPath: /mnt/efs
+  #     readOnly: false
+  #   - name: nfs-volume
+  #     mountPath: /mnt/nfs
+  #   - name: host-path-volume
+  #     mountPath: /mnt/host-data
+  extraVolumeMounts: []
 
 
 # Thingsboard Web Report Service configuration section
