@@ -114,6 +114,9 @@ spec:
               subPath: {{ .subPath | default ""}}
               {{- end }}
              {{- end }}
+            {{- if .Values.node.extraVolumeMounts }}
+            {{- toYaml .Values.node.extraVolumeMounts | nindent 12 }}
+            {{- end }}
       restartPolicy: {{ .Values.node.restartPolicy }}
       volumes:
         - name: {{ printf "%s-node-config" $releaseName}}
@@ -157,6 +160,9 @@ spec:
               {{- end}}
               {{- end }}
             {{- end }}
+        {{- end }}
+        {{- if .Values.node.extraVolumes }}
+        {{- toYaml .Values.node.extraVolumes | nindent 8 }}
         {{- end }}
         {{- if not .Values.node.persistence.enabled }}
         - name: {{ printf "%s-node-data" $releaseName}}
