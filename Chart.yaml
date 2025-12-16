@@ -13,11 +13,8 @@ annotations:
   artifacthub.io/prerelease: "true"
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
-    - kind: added
-      description: Add extraVolumes and extraVolumeMounts to node and rule-engine containers
-      links:
-        - name: GitHub PR
-          url: https://github.com/mykolaichukAlexander/thingsboard-cluster-helm/pull/58
+    - kind: fixed
+      description: Fix load balancer selector for transport services
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:
