@@ -1,4 +1,5 @@
 {{- $namespace := .Release.Namespace -}}
+{{ $releaseName := .Release.Name }}
 {{- if .Values.defaultIngress.enabled }}
  {{- range $key, $transport := .Values.transports }}
 {{- if $transport.enabled }}
@@ -11,7 +12,7 @@ spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
   selector:
-    app: {{ ternary (printf "%s-transprt" $transport.name) (include "thingsboard.node.label" $) $.Values.installation.msa }}
+    app: {{ ternary (printf "%s-%s" $releaseName $transport.name ) (include "thingsboard.node.label" $) $.Values.installation.msa }}
   ports:
     {{- range $transport.ports }}
     - port: {{ .value }}
