@@ -653,6 +653,8 @@ transports:
     name: http-transport
     # Enable or disable this transport into your cluster
     enabled: false
+    service:
+      annotations: {}
     image:
       # Transport custom repository. When blank - default repository will be used
       repository:
@@ -687,6 +689,8 @@ transports:
     name: coap-transport
     # Enable or disable this transport into your cluster
     enabled: false
+    service:
+      annotations: { }
     image:
       # Transport custom repository. When blank - default repository will be used
       repository:
@@ -721,6 +725,8 @@ transports:
     name: lwm2m-transport
     # Enable or disable this transport into your cluster
     enabled: false
+    service:
+      annotations: { }
     image:
       # Transport custom repository. When blank - default repository will be used
       repository:
@@ -750,6 +756,8 @@ transports:
     name: snmp-transport
     # Enable or disable this transport into your cluster
     enabled: false
+    service:
+      annotations: { }
     image:
       # Transport custom repository. When blank - default repository will be used
       repository:
@@ -774,6 +782,8 @@ transports:
     name: mqtt-transport
     # Enable or disable this transport into your cluster
     enabled: false
+    service:
+      annotations: { }
     image:
       # Transport custom repository. When blank - default repository will be used
       repository:

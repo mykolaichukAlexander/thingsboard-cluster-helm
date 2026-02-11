@@ -3,7 +3,7 @@ appVersion: 3.6.0
 description: Helm chart for Thingsboard cluster.
 name: thingsboard-cluster
 type: application
-version: 0.2.22
+version: 0.2.23
 annotations:
   artifacthub.io/category: streaming-messaging
   licenses: Apache-2.0
@@ -14,7 +14,7 @@ annotations:
   artifacthub.io/logoPath: thingsboard_white.png
   artifacthub.io/changes: |
     - kind: fixed
-      description: Fix load balancer selector for transport services
+      description: Added annotation support for transports services, fixed labels render issue
 home: https://thingsboard.io/
 icon: https://img.thingsboard.io/thingsboard_logo_blue.svg
 keywords:

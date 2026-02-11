@@ -1,6 +1,5 @@
 {{- $namespace := .Release.Namespace -}}
 {{ $releaseName := .Release.Name }}
-{{- if .Values.defaultIngress.enabled }}
  {{- range $key, $transport := .Values.transports }}
 {{- if $transport.enabled }}
 apiVersion: v1
@@ -8,6 +7,10 @@ kind: Service
 metadata:
   name: {{$transport.name}}-loadbalancer
   namespace: {{$namespace}}
+  {{- with $transport.service.annotations }}
+  annotations:
+      {{- toYaml $transport.service.annotations | nindent 4 }}
+  {{- end }}
 spec:
   type: LoadBalancer
   externalTrafficPolicy: Local
@@ -22,4 +25,4 @@ spec:
     {{- end }}
  {{- end}}
 {{- end}}
-  {{- end }}
+

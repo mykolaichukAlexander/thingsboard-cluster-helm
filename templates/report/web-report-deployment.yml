@@ -52,7 +52,7 @@ spec:
             tcpSocket:
               port: 8383
           resources:
-          {{- toYaml .Values.web.resources | nindent 12 }}
+          {{- toYaml .Values.report.resources | nindent 12 }}
       restartPolicy: Always
       {{- end }}
 
