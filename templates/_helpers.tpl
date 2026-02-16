@@ -319,9 +319,12 @@ Return a js image
 
 {{/*
 Init container that will slow deployment and let Service deploy after all script in conteiner will exit success or timeout
+Accepts optional "extraInitContainers" key with a list of extra init container specs to append after the validate-db container.
 */}}
 {{- define "thingsboard.initcontainers" }}
 {{- $context:= index . "context" | default . }}
+{{- $extraInitContainers := index . "extraInitContainers" | default nil }}
+{{- if or $context.Values.installation.installTb $extraInitContainers }}
 {{- if $context.Values.installation.installTb }}
 {{- $query := index . "pg_query" | default "Select count(*) from queue;" }}
 - name: validate-db
@@ -363,6 +366,10 @@ Init container that will slow deployment and let Service deploy after all script
   {{- if or $context.Values.internalCassandra.enabled $context.Values.externalCassandra.enabled }}
     - cqlsh-validator.sh
   {{- end }}
+{{- end }}
+{{- if $extraInitContainers }}
+{{ toYaml $extraInitContainers }}
+{{- end }}
 {{- else }}
 []
 {{- end }}

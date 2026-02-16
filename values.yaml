@@ -186,6 +186,26 @@ node:
   #   - name: host-path-volume
   #     mountPath: /mnt/host-data
   extraVolumeMounts: []
+  # Additional init containers to run before the main node/core container starts.
+  # Useful for tasks like importing certificates into Java truststore, running database migrations,
+  # waiting for external services, or generating configuration files.
+  # Each entry is a standard Kubernetes container spec.
+  # Example - importing a custom CA certificate into Java truststore:
+  # extraInitContainers:
+  #   - name: import-custom-cert
+  #     image: eclipse-temurin:17-jre
+  #     command: ["sh", "-c"]
+  #     args:
+  #       - |
+  #         cp $JAVA_HOME/lib/security/cacerts /custom-certs/cacerts
+  #         keytool -importcert -noprompt -keystore /custom-certs/cacerts \
+  #           -storepass changeit -alias my-ca -file /certs/ca.crt
+  #     volumeMounts:
+  #       - name: custom-certs
+  #         mountPath: /custom-certs
+  #       - name: ca-cert
+  #         mountPath: /certs
+  extraInitContainers: []
 
 ## This node category will use to configur Thingsboard rule engine in MSA mode.
 engine:
@@ -330,6 +350,26 @@ engine:
   #   - name: host-path-volume
   #     mountPath: /mnt/host-data
   extraVolumeMounts: []
+  # Additional init containers to run before the main rule-engine container starts.
+  # Useful for tasks like importing certificates into Java truststore, running database migrations,
+  # waiting for external services, or generating configuration files.
+  # Each entry is a standard Kubernetes container spec.
+  # Example - importing a custom CA certificate into Java truststore:
+  # extraInitContainers:
+  #   - name: import-custom-cert
+  #     image: eclipse-temurin:17-jre
+  #     command: ["sh", "-c"]
+  #     args:
+  #       - |
+  #         cp $JAVA_HOME/lib/security/cacerts /custom-certs/cacerts
+  #         keytool -importcert -noprompt -keystore /custom-certs/cacerts \
+  #           -storepass changeit -alias my-ca -file /certs/ca.crt
+  #     volumeMounts:
+  #       - name: custom-certs
+  #         mountPath: /custom-certs
+  #       - name: ca-cert
+  #         mountPath: /certs
+  extraInitContainers: []
 
 
 # Thingsboard Web Report Service configuration section

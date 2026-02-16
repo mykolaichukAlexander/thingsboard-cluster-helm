@@ -32,7 +32,7 @@ spec:
         {{- .Values.node.securityContext | toYaml | nindent 8 }}
       imagePullSecrets:
         - name: {{ .Values.global.imagePullSecret }}
-      initContainers: {{ include "thingsboard.initcontainers" . | indent 8 }}
+      initContainers: {{ include "thingsboard.initcontainers" (dict "context" . "extraInitContainers" .Values.node.extraInitContainers) | indent 8 }}
       containers:
         - name: server
           imagePullPolicy: {{ .Values.node.imagePullPolicy }}

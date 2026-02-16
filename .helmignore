@@ -28,3 +28,5 @@ test-config.txt
 test-secret.txt
 test-values.yaml
 CLAUDE.md
+.claude
+
