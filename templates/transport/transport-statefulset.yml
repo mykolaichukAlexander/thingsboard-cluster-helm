@@ -55,6 +55,25 @@ spec:
           volumeMounts:
             - mountPath: /config
               name: {{$releaseName}}-{{$transport.name}}-config
+            {{- if not ( empty $transport.extraConfigMapsVolumes ) }}
+                    {{- range $transport.extraConfigMapsVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: {{ .readOnly | default false}}
+              subPath: {{ .subPath | default ""}}
+                    {{- end }}
+            {{- end }}
+            {{- if not ( empty $transport.extraSecretsVolumes ) }}
+                    {{- range $transport.extraSecretsVolumes }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+              readOnly: {{ .readOnly | default false}}
+              subPath: {{ .subPath | default ""}}
+                    {{- end }}
+            {{- end }}
+            {{- if $transport.extraVolumeMounts }}
+            {{- toYaml $transport.extraVolumeMounts | nindent 12 }}
+            {{- end }}
       volumes:
         - name: {{$releaseName}}-{{$transport.name}}-config
           configMap:
@@ -64,5 +83,36 @@ spec:
                 path: {{$releaseName}}-{{$transport.name}}.conf
               - key: logback
                 path: logback.xml
+        {{- if not ( empty $transport.extraConfigMapsVolumes) }}
+                {{- range $transport.extraConfigMapsVolumes }}
+        - name: {{ .name }}
+          configMap:
+            name: {{ .name }}
+                    {{- if .items }}
+            items:
+                    {{- range .items }}
+              - key: {{ .key }}
+                path: {{ .path }}
+                    {{- end}}
+                    {{- end }}
+                {{- end }}
+            {{- end }}
+        {{- if not ( empty $transport.extraSecretsVolumes) }}
+              {{- range $transport.extraSecretsVolumes }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .name }}
+                  {{- if .items }}
+            items:
+                  {{- range .items }}
+              - key: {{ .key }}
+                path: {{ .path }}
+                  {{- end}}
+                  {{- end }}
+                {{- end }}
+        {{- end }}
+        {{- if $transport.extraVolumes }}
+        {{- toYaml $transport.extraVolumes | nindent 8 }}
+        {{- end }}
 {{- end}}
 {{- end}}

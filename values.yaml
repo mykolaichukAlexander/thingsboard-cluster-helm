@@ -724,6 +724,42 @@ transports:
       requests:
         cpu: "500m"
         memory: 500Mi
+    # Additional ConfigMap volumes to mount into the transport container
+    # Example:
+    # extraConfigMapsVolumes:
+    #   - name: my-configmap
+    #     mountPath: /path/to/mount
+    #     readOnly: true
+    #     subPath: ""
+    #     items:
+    #       - key: config-key
+    #         path: custom-name.conf
+    extraConfigMapsVolumes: []
+    # Additional Secret volumes to mount into the transport container
+    # Example:
+    # extraSecretsVolumes:
+    #   - name: my-secret
+    #     mountPath: /path/to/secrets
+    #     readOnly: true
+    #     subPath: ""
+    #     items:
+    #       - key: tls-cert
+    #         path: server.crt
+    extraSecretsVolumes: []
+    # Additional arbitrary volumes to mount into the transport container
+    # Example:
+    # extraVolumes:
+    #   - name: efs-volume
+    #     persistentVolumeClaim:
+    #       claimName: my-efs-pvc
+    extraVolumes: []
+    # Additional arbitrary volume mounts for the transport container
+    # Use this together with extraVolumes to mount the volumes defined above
+    # Example:
+    # extraVolumeMounts:
+    #   - name: efs-volume
+    #     mountPath: /mnt/efs
+    extraVolumeMounts: []
   coap:
     # Name that will be used for kubernetes resources like sts and services
     name: coap-transport
@@ -760,6 +796,14 @@ transports:
       requests:
         cpu: "500m"
         memory: 500Mi
+    # Additional ConfigMap volumes to mount into the transport container
+    extraConfigMapsVolumes: []
+    # Additional Secret volumes to mount into the transport container
+    extraSecretsVolumes: []
+    # Additional arbitrary volumes to mount into the transport container
+    extraVolumes: []
+    # Additional arbitrary volume mounts for the transport container
+    extraVolumeMounts: []
   lwm2m:
     # Name that will be used for kubernetes resources like sts and services
     name: lwm2m-transport
@@ -791,6 +835,14 @@ transports:
       requests:
         cpu: "500m"
         memory: 500Mi
+    # Additional ConfigMap volumes to mount into the transport container
+    extraConfigMapsVolumes: []
+    # Additional Secret volumes to mount into the transport container
+    extraSecretsVolumes: []
+    # Additional arbitrary volumes to mount into the transport container
+    extraVolumes: []
+    # Additional arbitrary volume mounts for the transport container
+    extraVolumeMounts: []
   snmp:
     # Name that will be used for kubernetes resources like sts and services
     name: snmp-transport
@@ -817,6 +869,14 @@ transports:
       requests:
         cpu: "500m"
         memory: 500Mi
+    # Additional ConfigMap volumes to mount into the transport container
+    extraConfigMapsVolumes: []
+    # Additional Secret volumes to mount into the transport container
+    extraSecretsVolumes: []
+    # Additional arbitrary volumes to mount into the transport container
+    extraVolumes: []
+    # Additional arbitrary volume mounts for the transport container
+    extraVolumeMounts: []
   mqtt:
     # Name that will be used for kubernetes resources like sts and services
     name: mqtt-transport
@@ -845,6 +905,14 @@ transports:
       requests:
         cpu: "500m"
         memory: 500Mi
+    # Additional ConfigMap volumes to mount into the transport container
+    extraConfigMapsVolumes: []
+    # Additional Secret volumes to mount into the transport container
+    extraSecretsVolumes: []
+    # Additional arbitrary volumes to mount into the transport container
+    extraVolumes: []
+    # Additional arbitrary volume mounts for the transport container
+    extraVolumeMounts: []
 
 
 
