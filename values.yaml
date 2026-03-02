@@ -1157,3 +1157,18 @@ defaultIngress:
   #   - secretName: thingsboard-tls
   #     hosts:
   #       - thingsboard.example.com
+  # Extra routes to add to the ingress (appended after the default routes).
+  # Each route requires path, pathType, serviceName, and servicePort.
+  # serviceName supports tpl rendering, so you can use chart helpers like:
+  #   '{{ include "thingsboard.node.host" . }}' or a plain string like 'tb-node'.
+  # Example - SSO routes:
+  # extraRoutes:
+  #   - path: /login/oauth2/code/
+  #     pathType: Prefix
+  #     serviceName: '{{ include "thingsboard.node.host" . }}'
+  #     servicePort: 8080
+  #   - path: /oauth2/authorization/
+  #     pathType: Prefix
+  #     serviceName: '{{ include "thingsboard.node.host" . }}'
+  #     servicePort: 8080
+  extraRoutes: []

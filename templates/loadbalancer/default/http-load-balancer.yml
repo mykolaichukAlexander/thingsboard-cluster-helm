@@ -73,6 +73,15 @@ spec:
                 name: {{ include "thingsboard.node.host" $ }}
                 port:
                   number: 8080
+          {{- range $.Values.defaultIngress.extraRoutes }}
+          - path: {{ .path }}
+            pathType: {{ .pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ tpl .serviceName $ }}
+                port:
+                  number: {{ .servicePort | default 8080 }}
+          {{- end }}
           - path: /
             pathType: ImplementationSpecific
             backend:
@@ -126,6 +135,15 @@ spec:
                 name: {{ include "thingsboard.node.host" . }}
                 port:
                   number: 8080
+          {{- range .Values.defaultIngress.extraRoutes }}
+          - path: {{ .path }}
+            pathType: {{ .pathType | default "Prefix" }}
+            backend:
+              service:
+                name: {{ tpl .serviceName $ }}
+                port:
+                  number: {{ .servicePort | default 8080 }}
+          {{- end }}
           - path: /
             pathType: ImplementationSpecific
             backend:
